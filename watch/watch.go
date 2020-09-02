@@ -2,6 +2,7 @@ package watch
 
 import (
 	"encoding/json"
+	"service-watch/internal/def"
 	"service-watch/internal/models"
 
 	"github.com/BurntSushi/toml"
@@ -44,7 +45,14 @@ func (s *ServiceWatcher) ReadConfig() error {
 	return nil
 }
 
-//Watch watches overall working of the apis.
-func (s *ServiceWatcher) Watch() {
+//TODO Watch
 
+//Watch watches overall working of the apis.
+func (s *ServiceWatcher) Watch() error {
+
+	if s.AppConfig.Api == nil {
+		return def.ErrAppConfigUnregistered
+	}
+
+	return nil
 }
