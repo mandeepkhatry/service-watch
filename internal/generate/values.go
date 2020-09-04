@@ -1,11 +1,13 @@
 package generate
 
 import (
+	"fmt"
 	"math/rand"
 	"service-watch/internal/def"
 	"time"
 
 	"github.com/Pallinder/go-randomdata"
+	"github.com/lucasjones/reggen"
 )
 
 func GenerateBoolean(properties map[string]interface{}) bool {
@@ -30,6 +32,14 @@ func GenerateInteger(properties map[string]interface{}) int {
 		min = properties["minimum"].(int)
 	}
 
+	if _, present := properties["enum"]; present {
+		enum := properties["enum"].([]int)
+		if len(enum) > 0 {
+			return enum[0]
+		}
+		return 0
+	}
+
 	return rand.Intn(max-min+1) + min
 }
 
@@ -51,6 +61,14 @@ func GenerateFloat(properties map[string]interface{}) float64 {
 		min = properties["minimum"].(float64)
 	}
 
+	if _, present := properties["enum"]; present {
+		enum := properties["enum"].([]float64)
+		if len(enum) > 0 {
+			return enum[0]
+		}
+		return 0.0
+	}
+
 	return rand.Float64()*(max-min) + min
 }
 
@@ -69,6 +87,14 @@ func GenerateString(properties map[string]interface{}) string {
 		minLength = 0.0
 	} else {
 		minLength = properties["minLength"].(int)
+	}
+
+	if _, present := properties["enum"]; present {
+		enum := properties["enum"].([]string)
+		if len(enum) > 0 {
+			return enum[0]
+		}
+		return "test"
 	}
 
 	stringLength := rand.Intn(maxLength-minLength+1) + minLength
@@ -162,6 +188,84 @@ func GenerateStringType(stringType string) string {
 	} else if stringType == "date" {
 		return "2018-11-13"
 	}
-
 	return "unknown field"
+}
+
+func GenerateRegex(regex string) string {
+	str, _ := reggen.Generate(regex, 1)
+	return str
+}
+
+func GenerateArray(properties map[string]interface{}) interface{} {
+
+	if _, typePresent := properties["items"]; !typePresent {
+		var maxItems int
+
+		if _, present := properties["maxItems"]; !present {
+			maxItems = 10
+		} else {
+			maxItems = properties["maxItems"].(int)
+		}
+
+		// if _, present := properties["minItems"]; !present {
+		// 	minItems = 0
+		// } else {
+		// 	minItems = properties["minItems"].(int)
+		// }
+
+		numberArray := make([]float64, 0)
+
+		var arrayProperties = map[string]interface{}{
+			"maximum": 10.0,
+			"minimum": 5.0,
+		}
+
+		for i := 0; i < maxItems; i++ {
+			numberArray = append(numberArray, GenerateFloat(arrayProperties))
+		}
+
+		return numberArray
+	}
+
+	arrayItemType := fmt.Sprintf("%T", properties["items"])
+
+	if arrayItemType == "[]map[string]interface {}" {
+
+		resultingArray := make([]interface{}, 0)
+
+		for _, eachTypeProperties := range properties["items"].([]map[string]interface{}) {
+
+			eachArrayType := eachTypeProperties["type"].(string)
+
+			if eachArrayType == "number" {
+				resultingArray = append(resultingArray, GenerateFloat(eachTypeProperties))
+
+			} else if eachArrayType == "string" {
+				resultingArray = append(resultingArray, GenerateString(eachTypeProperties))
+			}
+
+		}
+
+		//Mix Type Array
+
+	} else if arrayItemType == "map[string]interface {}" {
+
+		//Single Type Array
+
+		itemType := properties["items"].(map[string]interface{})["type"].(string)
+
+		if itemType == "number" {
+
+			return GenerateNumberArray(properties)
+
+		} else if itemType == "string" {
+
+			return GenerateNumberArray(properties)
+
+		}
+
+	}
+
+	return []string{}
+
 }
