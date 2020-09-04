@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"service-watch/internal/def"
+	"strconv"
 	"time"
 
 	"github.com/Pallinder/go-randomdata"
@@ -291,12 +292,7 @@ func GenerateArray(properties map[string]interface{}) interface{} {
 
 			eachArrayType := eachTypeProperties["type"].(string)
 
-			if eachArrayType == "number" {
-				resultingArray = append(resultingArray, GenerateFloat(eachTypeProperties))
-
-			} else if eachArrayType == "string" {
-				resultingArray = append(resultingArray, GenerateString(eachTypeProperties))
-			}
+			resultingArray = append(resultingArray, FieldToGenerator[eachArrayType])
 
 		}
 
@@ -308,15 +304,7 @@ func GenerateArray(properties map[string]interface{}) interface{} {
 
 		itemType := properties["items"].(map[string]interface{})["type"].(string)
 
-		if itemType == "number" {
-
-			return GenerateNumberArray(properties)
-
-		} else if itemType == "string" {
-
-			return GenerateNumberArray(properties)
-
-		}
+		return FieldToGenerator[itemType]
 
 	}
 
@@ -327,9 +315,21 @@ func GenerateArray(properties map[string]interface{}) interface{} {
 func GenerateObject(properties map[string]interface{}) map[string]interface{} {
 
 	if _, present := properties["properties"]; !present {
+		if _, minPropertiesPresent := properties["minProperties"]; minPropertiesPresent {
+			minPropertiesPresent := properties["minProperties"].(int)
+
+			randomObject := make(map[string]interface{})
+
+			for i := 0; i < minPropertiesPresent; i++ {
+				randomObject["test"+strconv.Itoa(i)] = i
+			}
+
+			return randomObject
+		}
+
 		return map[string]interface{}{
-			"name": "test",
-			"age":  100,
+			"k1": "v1",
+			"k2": "v2",
 		}
 	}
 
@@ -347,19 +347,9 @@ func GenerateObject(properties map[string]interface{}) map[string]interface{} {
 		patternProperties := properties["patternProperties"].(map[string]interface{})
 
 		for field, fieldProperties := range patternProperties {
-			fieldType := fieldProperties.(map[string]interface{})["type"]
-
+			fieldType := fieldProperties.(map[string]interface{})["type"].(string)
 			patternFieldName := GenerateRegex(field)
-
-			if fieldType == "number" {
-				generatedObject[patternFieldName] = GenerateFloat(fieldProperties.(map[string]interface{}))
-			} else if fieldType == "integer" {
-				generatedObject[patternFieldName] = GenerateInteger(fieldProperties.(map[string]interface{}))
-			} else if fieldType == "string" {
-				generatedObject[patternFieldName] = GenerateString(fieldProperties.(map[string]interface{}))
-			} else if fieldType == "array" {
-				generatedObject[patternFieldName] = GenerateArray(fieldProperties.(map[string]interface{}))
-			}
+			generatedObject[patternFieldName] = FieldToGenerator[fieldType]
 		}
 
 	}
@@ -368,16 +358,9 @@ func GenerateObject(properties map[string]interface{}) map[string]interface{} {
 		objectProperties := properties["properties"].(map[string]interface{})
 
 		for field, fieldProperties := range objectProperties {
-			fieldType := fieldProperties.(map[string]interface{})["type"]
-			if fieldType == "number" {
-				generatedObject[field] = GenerateFloat(fieldProperties.(map[string]interface{}))
-			} else if fieldType == "integer" {
-				generatedObject[field] = GenerateInteger(fieldProperties.(map[string]interface{}))
-			} else if fieldType == "string" {
-				generatedObject[field] = GenerateString(fieldProperties.(map[string]interface{}))
-			} else if fieldType == "array" {
-				generatedObject[field] = GenerateArray(fieldProperties.(map[string]interface{}))
-			}
+			fieldType := fieldProperties.(map[string]interface{})["type"].(string)
+			generatedObject[field] = FieldToGenerator[fieldType]
+
 		}
 
 	}
