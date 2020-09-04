@@ -97,6 +97,14 @@ func GenerateString(properties map[string]interface{}) string {
 		return "test"
 	}
 
+	if _, present := properties["format"]; present {
+		return GenerateStringFormat(properties["format"].(string))
+	}
+
+	if _, present := properties["pattern"]; present {
+		return GenerateRegex(properties["pattern"].(string))
+	}
+
 	stringLength := rand.Intn(maxLength-minLength+1) + minLength
 
 	b := make([]byte, stringLength)
@@ -176,7 +184,7 @@ func GenerateStringArray(properties map[string]interface{}) []string {
 
 }
 
-func GenerateStringType(stringType string) string {
+func GenerateStringFormat(stringType string) string {
 	if stringType == "ipv4" {
 		return randomdata.IpV4Address()
 	} else if stringType == "ipv6" {
