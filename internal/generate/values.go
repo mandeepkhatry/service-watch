@@ -20,6 +20,14 @@ func GenerateInteger(properties map[string]interface{}) int {
 
 	var min, max int
 
+	if _, present := properties["exclusiveMaximum"]; present {
+		max = properties["exclusiveMaximum"].(int) - 1
+	}
+
+	if _, present := properties["exclusiveMinimum"]; present {
+		min = properties["exclusiveMinimum"].(int) + 1
+	}
+
 	if _, present := properties["maximum"]; !present {
 		max = 100
 	} else {
@@ -40,6 +48,20 @@ func GenerateInteger(properties map[string]interface{}) int {
 		return 0
 	}
 
+	if _, present := properties["multipleOf"]; present {
+		multipleOf := properties["multipleOf"].(int)
+		i := 0
+		for {
+			eachMultiple := multipleOf * i
+			if eachMultiple >= min && eachMultiple <= max {
+				return multipleOf * i
+			} else if eachMultiple > max {
+				return 0
+			}
+
+		}
+	}
+
 	return rand.Intn(max-min+1) + min
 }
 
@@ -48,6 +70,14 @@ func GenerateFloat(properties map[string]interface{}) float64 {
 	rand.Seed(time.Now().UnixNano())
 
 	var min, max float64
+
+	if _, present := properties["exclusiveMaximum"]; present {
+		max = properties["exclusiveMaximum"].(float64) - 0.5
+	}
+
+	if _, present := properties["exclusiveMinimum"]; present {
+		min = properties["exclusiveMinimum"].(float64) + 0.5
+	}
 
 	if _, present := properties["maximum"]; !present {
 		max = 100.0
@@ -67,6 +97,20 @@ func GenerateFloat(properties map[string]interface{}) float64 {
 			return enum[0]
 		}
 		return 0.0
+	}
+
+	if _, present := properties["multipleOf"]; present {
+		multipleOf := properties["multipleOf"].(float64)
+		i := 0.0
+		for {
+			eachMultiple := multipleOf * i
+			if eachMultiple >= min && eachMultiple <= max {
+				return multipleOf * i
+			} else if eachMultiple > max {
+				return 0.0
+			}
+
+		}
 	}
 
 	return rand.Float64()*(max-min) + min
@@ -195,6 +239,8 @@ func GenerateStringFormat(stringType string) string {
 		return "20:20:39+00:00"
 	} else if stringType == "date" {
 		return "2018-11-13"
+	} else if stringType == "email" {
+		return GenerateEmail()
 	}
 	return "unknown field"
 }
