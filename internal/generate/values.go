@@ -323,3 +323,64 @@ func GenerateArray(properties map[string]interface{}) interface{} {
 	return []string{}
 
 }
+
+func GenerateObject(properties map[string]interface{}) map[string]interface{} {
+
+	if _, present := properties["properties"]; !present {
+		return map[string]interface{}{
+			"name": "test",
+			"age":  100,
+		}
+	}
+
+	if _, present := properties["propertyNames"]; present {
+		pattern := properties["propertyNames"].(string)
+		return map[string]interface{}{
+			GenerateRegex(pattern): "value",
+		}
+	}
+
+	generatedObject := make(map[string]interface{}, 0)
+
+	if _, present := properties["patternProperties"]; present {
+
+		patternProperties := properties["patternProperties"].(map[string]interface{})
+
+		for field, fieldProperties := range patternProperties {
+			fieldType := fieldProperties.(map[string]interface{})["type"]
+
+			patternFieldName := GenerateRegex(field)
+
+			if fieldType == "number" {
+				generatedObject[patternFieldName] = GenerateFloat(fieldProperties.(map[string]interface{}))
+			} else if fieldType == "integer" {
+				generatedObject[patternFieldName] = GenerateInteger(fieldProperties.(map[string]interface{}))
+			} else if fieldType == "string" {
+				generatedObject[patternFieldName] = GenerateString(fieldProperties.(map[string]interface{}))
+			} else if fieldType == "array" {
+				generatedObject[patternFieldName] = GenerateArray(fieldProperties.(map[string]interface{}))
+			}
+		}
+
+	}
+
+	if _, present := properties["properties"]; present {
+		objectProperties := properties["properties"].(map[string]interface{})
+
+		for field, fieldProperties := range objectProperties {
+			fieldType := fieldProperties.(map[string]interface{})["type"]
+			if fieldType == "number" {
+				generatedObject[field] = GenerateFloat(fieldProperties.(map[string]interface{}))
+			} else if fieldType == "integer" {
+				generatedObject[field] = GenerateInteger(fieldProperties.(map[string]interface{}))
+			} else if fieldType == "string" {
+				generatedObject[field] = GenerateString(fieldProperties.(map[string]interface{}))
+			} else if fieldType == "array" {
+				generatedObject[field] = GenerateArray(fieldProperties.(map[string]interface{}))
+			}
+		}
+
+	}
+	return generatedObject
+
+}
