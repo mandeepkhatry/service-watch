@@ -15,6 +15,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(watcher.AppConfig.Api["mock"].Methods["post"].Request.Validator)
+	fmt.Println(watcher.AppConfig.Api["mock"])
 
 }
