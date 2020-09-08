@@ -49,31 +49,38 @@ func main() {
 
 	var prop = map[string]interface{}{
 		"type": "object",
-		"properties": map[string]interface{}{
-			"num": map[string]interface{}{
-				"type": "number",
-			},
-			"street_num": map[string]interface{}{
-				"type": "number",
-			},
-			"name": map[string]interface{}{
-				"type": "string",
-			},
-			"array": map[string]interface{}{
-				"type": "array",
-				"items": []map[string]interface{}{
-					map[string]interface{}{
-						"type": "number",
-					},
-					map[string]interface{}{
-						"type": "number",
-					},
-					map[string]interface{}{
-						"type": "string",
-					},
-				},
-			},
+		"patternProperties": map[string]interface{}{
+			"^S_": map[string]interface{}{"type": "string"},
+			"^I_": map[string]interface{}{"type": "integer"},
 		},
+		// "propertyNames": map[string]interface{}{
+		// 	"pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+		// },
+		// "properties": map[string]interface{}{
+		// 	"num": map[string]interface{}{
+		// 		"type": "number",
+		// 	},
+		// 	"street_num": map[string]interface{}{
+		// 		"type": "number",
+		// 	},
+		// 	"name": map[string]interface{}{
+		// 		"type": "string",
+		// 	},
+		// 	"array": map[string]interface{}{
+		// 		"type": "array",
+		// 		"items": []map[string]interface{}{
+		// 			map[string]interface{}{
+		// 				"type": "number",
+		// 			},
+		// 			map[string]interface{}{
+		// 				"type": "number",
+		// 			},
+		// 			map[string]interface{}{
+		// 				"type": "string",
+		// 			},
+		// 		},
+		// 	},
+		// },
 	}
 
 	x := generate.GenerateObject(prop)

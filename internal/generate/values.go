@@ -326,27 +326,8 @@ func GenerateArray(properties map[string]interface{}) interface{} {
 
 func GenerateObject(properties map[string]interface{}) map[string]interface{} {
 
-	if _, present := properties["properties"]; !present {
-		if _, minPropertiesPresent := properties["minProperties"]; minPropertiesPresent {
-			minPropertiesPresent := properties["minProperties"].(int)
-
-			randomObject := make(map[string]interface{})
-
-			for i := 0; i < minPropertiesPresent; i++ {
-				randomObject["test"+strconv.Itoa(i)] = i
-			}
-
-			return randomObject
-		}
-
-		return map[string]interface{}{
-			"k1": "v1",
-			"k2": "v2",
-		}
-	}
-
 	if _, present := properties["propertyNames"]; present {
-		pattern := properties["propertyNames"].(string)
+		pattern := properties["propertyNames"].(map[string]interface{})["pattern"].(string)
 		return map[string]interface{}{
 			GenerateRegex(pattern): "value",
 		}
@@ -387,8 +368,23 @@ func GenerateObject(properties map[string]interface{}) map[string]interface{} {
 			}
 
 		}
-
 	}
+
+	if len(generatedObject) == 0 {
+		if _, minPropertiesPresent := properties["minProperties"]; minPropertiesPresent {
+			minPropertiesPresent := properties["minProperties"].(int)
+
+			for i := 0; i < minPropertiesPresent; i++ {
+				generatedObject["test"+strconv.Itoa(i)] = i
+			}
+
+			return generatedObject
+		}
+
+		generatedObject["k1"] = "v1"
+		generatedObject["k2"] = "v2"
+	}
+
 	return generatedObject
 
 }
