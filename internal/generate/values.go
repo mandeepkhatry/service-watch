@@ -70,6 +70,7 @@ func GenerateInteger(properties map[string]interface{}) int {
 			} else if eachMultiple > max {
 				return 0
 			}
+			i++
 
 		}
 	}
@@ -330,8 +331,9 @@ func GenerateArray(properties map[string]interface{}) interface{} {
 
 			if eachArrayType == "array" {
 				resultingArray = append(resultingArray, GenerateArray(eachTypeProperties))
+			} else if eachArrayType == "object" {
+				resultingArray = append(resultingArray, GenerateObject(eachTypeProperties))
 			} else {
-				fmt.Println(eachTypeProperties)
 				resultingArray = append(resultingArray, FieldToGenerator[eachArrayType](eachTypeProperties))
 			}
 
@@ -348,6 +350,8 @@ func GenerateArray(properties map[string]interface{}) interface{} {
 
 		if itemType == "array" {
 			return GenerateArray(properties["items"].(map[string]interface{}))
+		} else if itemType == "object" {
+			return []interface{}{GenerateObject(properties["items"].(map[string]interface{}))}
 		}
 
 		return FieldToGenerator["array_"+itemType](properties["items"].(map[string]interface{}))
@@ -379,6 +383,8 @@ func GenerateObject(properties map[string]interface{}) map[string]interface{} {
 
 			if fieldType == "array" {
 				generatedObject[patternFieldName] = GenerateArray(fieldProperties.(map[string]interface{}))
+			} else if fieldType == "object" {
+				generatedObject[patternFieldName] = GenerateObject(fieldProperties.(map[string]interface{}))
 			} else {
 				generatedObject[patternFieldName] = FieldToGenerator[fieldType](fieldProperties.(map[string]interface{}))
 			}
@@ -396,6 +402,8 @@ func GenerateObject(properties map[string]interface{}) map[string]interface{} {
 			if fieldType == "array" {
 				generatedObject[field] = GenerateArray(fieldProperties.(map[string]interface{}))
 
+			} else if fieldType == "object" {
+				generatedObject[field] = GenerateObject(fieldProperties.(map[string]interface{}))
 			} else {
 				generatedObject[field] = FieldToGenerator[fieldType](fieldProperties.(map[string]interface{}))
 
