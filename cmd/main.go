@@ -52,6 +52,10 @@ func main() {
 		"patternProperties": map[string]interface{}{
 			"^S_": map[string]interface{}{"type": "string"},
 			"^I_": map[string]interface{}{"type": "integer"},
+			"^K_": map[string]interface{}{
+				"type": "string",
+				"enum": []string{"Street", "Avenue", "Boulevard"},
+			},
 		},
 		// "propertyNames": map[string]interface{}{
 		// 	"pattern": "^[A-Za-z_][A-Za-z0-9_]*$",

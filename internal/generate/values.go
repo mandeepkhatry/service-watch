@@ -17,6 +17,17 @@ func GenerateBoolean(properties map[string]interface{}) bool {
 
 func GenerateInteger(properties map[string]interface{}) int {
 
+	if _, present := properties["enum"]; present {
+		if len(properties["enum"].([]int)) != 0 {
+			return properties["enum"].([]int)[0]
+		}
+	}
+
+	if _, present := properties["constant"]; present {
+		return properties["constant"].(int)
+
+	}
+
 	rand.Seed(time.Now().UnixNano())
 
 	var min, max int
@@ -68,6 +79,18 @@ func GenerateInteger(properties map[string]interface{}) int {
 
 func GenerateFloat(properties map[string]interface{}) float64 {
 
+	if _, present := properties["enum"]; present {
+		if len(properties["enum"].([]float64)) != 0 {
+			return properties["enum"].([]float64)[0]
+		}
+
+	}
+
+	if _, present := properties["constant"]; present {
+		return properties["constant"].(float64)
+
+	}
+
 	rand.Seed(time.Now().UnixNano())
 
 	var min, max float64
@@ -118,6 +141,19 @@ func GenerateFloat(properties map[string]interface{}) float64 {
 }
 
 func GenerateString(properties map[string]interface{}) string {
+
+	if _, present := properties["enum"]; present {
+		if len(properties["enum"].([]string)) != 0 {
+			return properties["enum"].([]string)[0]
+		}
+
+	}
+
+	if _, present := properties["constant"]; present {
+		return properties["constant"].(string)
+
+	}
+
 	rand.Seed(time.Now().UnixNano())
 
 	var minLength, maxLength int
@@ -285,8 +321,6 @@ func GenerateArray(properties map[string]interface{}) interface{} {
 	arrayItemType := fmt.Sprintf("%T", properties["items"])
 
 	if arrayItemType == "[]map[string]interface {}" {
-
-		fmt.Println("HERE")
 
 		resultingArray := make([]interface{}, 0)
 
