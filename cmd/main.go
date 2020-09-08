@@ -16,7 +16,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(watcher.AppConfig.Api["mock"])
+	fmt.Println(watcher.AppConfig.Api["users"])
 
 	fmt.Println(generate.GenerateFloat(map[string]interface{}{"type": "number"}))
 
@@ -86,10 +86,32 @@ func main() {
 					},
 				},
 			},
+			"inside-object": map[string]interface{}{
+				"type": "object",
+				"properties": map[string]interface{}{
+					"mynumber": map[string]interface{}{
+						"type": "number",
+					},
+					"name": map[string]interface{}{
+						"type": "string",
+					},
+					"inside-inside-object": map[string]interface{}{
+						"type": "object",
+						"properties": map[string]interface{}{
+							"insidemynumber": map[string]interface{}{
+								"type": "number",
+							},
+							"insidename": map[string]interface{}{
+								"type": "string",
+							},
+						},
+					},
+				},
+			},
 		},
 	}
 
-	x := generate.GenerateObject(prop)
+	x := generate.GenerateDummyData(prop)
 
 	fmt.Println(x)
 

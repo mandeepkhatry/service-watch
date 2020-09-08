@@ -41,13 +41,13 @@ func GenerateInteger(properties map[string]interface{}) int {
 	}
 
 	if _, present := properties["maximum"]; !present {
-		max = 100
+		max = def.DummyDataRange["integer"].(map[string]int)["maximum"]
 	} else {
 		max = properties["maximum"].(int)
 	}
 
 	if _, present := properties["minimum"]; !present {
-		min = 0
+		min = def.DummyDataRange["integer"].(map[string]int)["minimum"]
 	} else {
 		min = properties["minimum"].(int)
 	}
@@ -105,13 +105,13 @@ func GenerateFloat(properties map[string]interface{}) float64 {
 	}
 
 	if _, present := properties["maximum"]; !present {
-		max = 100.0
+		max = def.DummyDataRange["number"].(map[string]float64)["maximum"]
 	} else {
 		max = properties["maximum"].(float64)
 	}
 
 	if _, present := properties["minimum"]; !present {
-		min = 0.0
+		min = def.DummyDataRange["number"].(map[string]float64)["minimum"]
 	} else {
 		min = properties["minimum"].(float64)
 	}
@@ -160,13 +160,13 @@ func GenerateString(properties map[string]interface{}) string {
 	var minLength, maxLength int
 
 	if _, present := properties["maxLength"]; !present {
-		maxLength = 10.0
+		maxLength = def.DummyDataRange["string"].(map[string]int)["maxLength"]
 	} else {
 		maxLength = properties["maxLength"].(int)
 	}
 
 	if _, present := properties["minLength"]; !present {
-		minLength = 0.0
+		minLength = def.DummyDataRange["string"].(map[string]int)["minLength"]
 	} else {
 		minLength = properties["minLength"].(int)
 	}
@@ -204,68 +204,6 @@ func GenerateEmail() string {
 	return GenerateString(properties) + "@xyz.com"
 }
 
-func GenerateNumberArray(properties map[string]interface{}) []float64 {
-
-	var maxItems int
-
-	if _, present := properties["maxItems"]; !present {
-		maxItems = 1
-	} else {
-		maxItems = properties["maxItems"].(int)
-	}
-
-	// if _, present := properties["minItems"]; !present {
-	// 	minItems = 0
-	// } else {
-	// 	minItems = properties["minItems"].(int)
-	// }
-
-	numberArray := make([]float64, 0)
-
-	var arrayProperties = map[string]interface{}{
-		"maximum": 10.0,
-		"minimum": 5.0,
-	}
-
-	for i := 0; i < maxItems; i++ {
-		numberArray = append(numberArray, GenerateFloat(arrayProperties))
-	}
-
-	return numberArray
-
-}
-
-func GenerateStringArray(properties map[string]interface{}) []string {
-
-	var maxItems int
-
-	if _, present := properties["maxItems"]; !present {
-		maxItems = 1
-	} else {
-		maxItems = properties["maxItems"].(int)
-	}
-
-	// if _, present := properties["minItems"]; !present {
-	// 	minItems = 0
-	// } else {
-	// 	minItems = properties["minItems"].(int)
-	// }
-
-	stringArray := make([]string, 0)
-
-	var arrayProperties = map[string]interface{}{
-		"maxLength": 10,
-		"minLength": 5,
-	}
-
-	for i := 0; i < maxItems; i++ {
-		stringArray = append(stringArray, GenerateString(arrayProperties))
-	}
-
-	return stringArray
-
-}
-
 func GenerateStringFormat(stringType string) string {
 	if stringType == "ipv4" {
 		return randomdata.IpV4Address()
@@ -294,7 +232,7 @@ func GenerateArray(properties map[string]interface{}) interface{} {
 		var maxItems int
 
 		if _, present := properties["maxItems"]; !present {
-			maxItems = 10
+			maxItems = def.DummyDataRange["array"].(map[string]int)["maximum"]
 		} else {
 			maxItems = properties["maxItems"].(int)
 		}
@@ -308,8 +246,8 @@ func GenerateArray(properties map[string]interface{}) interface{} {
 		numberArray := make([]float64, 0)
 
 		var arrayProperties = map[string]interface{}{
-			"maximum": 10.0,
-			"minimum": 5.0,
+			"maximum": def.DummyDataRange["number"].(map[string]int)["maximum"],
+			"minimum": def.DummyDataRange["number"].(map[string]int)["minimum"],
 		}
 
 		for i := 0; i < maxItems; i++ {
@@ -353,8 +291,6 @@ func GenerateArray(properties map[string]interface{}) interface{} {
 		} else if itemType == "object" {
 			return []interface{}{GenerateObject(properties["items"].(map[string]interface{}))}
 		}
-
-		return FieldToGenerator["array_"+itemType](properties["items"].(map[string]interface{}))
 
 	}
 

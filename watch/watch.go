@@ -8,6 +8,8 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+//TODO Swagger Parsing, traversal... after Anish finishes deploying swagger
+
 type ServiceWatcher struct {
 	ConfigPath string
 	AppConfig  models.AppConfig
