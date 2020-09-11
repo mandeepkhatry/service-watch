@@ -7,14 +7,12 @@ import (
 	"net/http"
 	"service-watch/internal/def"
 	"service-watch/internal/models"
-	"strconv"
 	"time"
 )
 
 type HTTPClient struct {
 	Client *http.Client
 	Host   string
-	Port   int
 }
 
 //NewHTTPClient returns new HttpClient instance.
@@ -24,7 +22,6 @@ func NewHTTPClient(config map[string]interface{}) *HTTPClient {
 			Timeout: time.Duration(config["timeout"].(int)) * time.Second,
 		},
 		Host: config["host"].(string),
-		Port: config["timeout"].(int),
 	}
 }
 
@@ -33,7 +30,7 @@ func (c *HTTPClient) ExecuteRequest(method string, endpoint string, requestBody 
 	var req *http.Request
 	var err error
 
-	url := c.Host + ":" + strconv.Itoa(c.Port) + endpoint
+	url := c.Host + endpoint
 
 	start := time.Now()
 

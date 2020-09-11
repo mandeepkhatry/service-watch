@@ -3,5 +3,6 @@ package def
 import "errors"
 
 var (
-	ErrAppConfigUnregistered = errors.New("App Config Unregistered")
+	ErrSwaggerConfigUnregistered = errors.New("Swagger Config Unregistered")
+	ErrServersUnregistered       = errors.New("Servers Config Unregistered")
 )

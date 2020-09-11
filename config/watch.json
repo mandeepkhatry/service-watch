@@ -1,5 +1,5 @@
 {
-    "host": "http://159.89.175.245",
-    "port": 4000,
+    "host": "https://call-logs.raralabs.com",
+    "endpoint": "/gokyo-kb/swaggerui?format=json",
     "timeout": 10
 }

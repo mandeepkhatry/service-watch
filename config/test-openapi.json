@@ -1,0 +1,978 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "GOKYO_KB",
+        "description": "Gokyo kb ",
+        "termsOfService": "http://gokyolabs.com/terms",
+        "contact": {
+            "name": "GOKYO LABS",
+            "url": "http://gokyolabs.com",
+            "email": "hey@gokyolabs.com"
+        },
+        "license": {
+            "name": "Proprietary",
+            "url": ""
+        },
+        "version": "1.0.0"
+    },
+    "servers": [{
+        "url": "http://159.89.175.245:4000/gokyo-kb",
+        "description": "Development Server"
+    }],
+    "paths": {
+        "/download-file": {
+            "description": "",
+            "get": {
+                "tags": [
+                    "downloadFile"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            },
+            "summary": ""
+        },
+        "/login": {
+            "description": "",
+            "post": {
+                "tags": [
+                    "login"
+                ],
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/login"
+                            }
+                        }
+                    },
+                    "required": false
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "summary": ""
+        },
+        "/plugin-types": {
+            "description": "",
+            "get": {
+                "tags": [
+                    "plugin-types"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "plugin-types"
+                ],
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/plugin-types"
+                            }
+                        }
+                    },
+                    "required": false
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "summary": ""
+        },
+        "/plugin-types/{id}": {
+            "delete": {
+                "tags": [
+                    "plugin-type"
+                ],
+                "summary": "",
+                "description": "",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "deprecated": false,
+                    "allowEmptyValue": false,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "description": "",
+            "get": {
+                "tags": [
+                    "plugin-type"
+                ],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "deprecated": false,
+                    "allowEmptyValue": false,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "plugin-type"
+                ],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "deprecated": false,
+                    "allowEmptyValue": false,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/plugin-type"
+                            }
+                        }
+                    },
+                    "required": false
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "plugin-type"
+                ],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "deprecated": false,
+                    "allowEmptyValue": false,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/plugin-type"
+                            }
+                        }
+                    },
+                    "required": false
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "summary": ""
+        },
+        "/plugins": {
+            "description": "",
+            "get": {
+                "tags": [
+                    "plugins"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "plugins"
+                ],
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/plugins"
+                            }
+                        }
+                    },
+                    "required": false
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "summary": ""
+        },
+        "/plugins/{id}": {
+            "delete": {
+                "tags": [
+                    "plugin"
+                ],
+                "summary": "",
+                "description": "",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "deprecated": false,
+                    "allowEmptyValue": false,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "description": "",
+            "get": {
+                "tags": [
+                    "plugin"
+                ],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "deprecated": false,
+                    "allowEmptyValue": false,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "plugin"
+                ],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "deprecated": false,
+                    "allowEmptyValue": false,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/plugin"
+                            }
+                        }
+                    },
+                    "required": false
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "summary": ""
+        },
+        "/projects": {
+            "description": "",
+            "get": {
+                "tags": [
+                    "projects"
+                ],
+                "security": [{
+                    "BearerAuth": []
+                }],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "projects"
+                ],
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/projects"
+                            }
+                        }
+                    },
+                    "required": false
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "summary": ""
+        },
+        "/projects/{id}": {
+            "delete": {
+                "tags": [
+                    "project"
+                ],
+                "summary": "",
+                "description": "",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "deprecated": false,
+                    "allowEmptyValue": false,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "description": "",
+            "get": {
+                "tags": [
+                    "project"
+                ],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "deprecated": false,
+                    "allowEmptyValue": false,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "project"
+                ],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "deprecated": false,
+                    "allowEmptyValue": false,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/project"
+                            }
+                        }
+                    },
+                    "required": false
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "summary": ""
+        },
+        "/refresh-token": {
+            "description": "",
+            "post": {
+                "tags": [
+                    "refresh-token"
+                ],
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/refresh-token"
+                            }
+                        }
+                    },
+                    "required": false
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "summary": ""
+        },
+        "/upload-file": {
+            "description": "",
+            "post": {
+                "tags": [
+                    "uploadFile"
+                ],
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": ""
+                            }
+                        }
+                    },
+                    "required": false
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "summary": ""
+        },
+        "/users": {
+            "description": "",
+            "get": {
+                "tags": [
+                    "users"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "users"
+                ],
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/users"
+                            }
+                        }
+                    },
+                    "required": false
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "summary": ""
+        },
+        "/users/{id}": {
+            "delete": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "",
+                "description": "",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "deprecated": false,
+                    "allowEmptyValue": false,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "description": "",
+            "get": {
+                "tags": [
+                    "user"
+                ],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "deprecated": false,
+                    "allowEmptyValue": false,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "user"
+                ],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "",
+                    "required": true,
+                    "deprecated": false,
+                    "allowEmptyValue": false,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/user"
+                            }
+                        }
+                    },
+                    "required": false
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "summary": ""
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer"
+            }
+        },
+        "schemas": {
+            "login": {
+                "type": "object",
+                "required": [
+                    "username",
+                    "password"
+                ],
+                "properties": {
+                    "password": {
+                        "type": "string"
+                    },
+                    "username": {
+                        "type": "string"
+                    }
+                },
+                "description": ""
+            },
+            "plugin": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "description"
+                ],
+                "properties": {
+                    "description": {
+                        "type": "string",
+                        "minLength": 6
+                    },
+                    "name": {
+                        "type": "string",
+                        "minLength": 6
+                    }
+                },
+                "description": ""
+            },
+            "plugin-type": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "description"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 6
+                    }
+                },
+                "description": ""
+            },
+            "plugin-types": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "description",
+                    "project_id"
+                ],
+                "properties": {
+                    "description": {
+                        "type": "string",
+                        "minLength": 6
+                    },
+                    "name": {
+                        "type": "string",
+                        "minLength": 6
+                    },
+                    "project_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                "description": ""
+            },
+            "plugins": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "description",
+                    "path",
+                    "type_id"
+                ],
+                "properties": {
+                    "description": {
+                        "type": "string",
+                        "minLength": 6
+                    },
+                    "name": {
+                        "type": "string",
+                        "minLength": 6
+                    },
+                    "path": {
+                        "type": "string"
+                    },
+                    "type_id": {
+                        "type": "string",
+                        "minLength": 6
+                    }
+                },
+                "description": ""
+            },
+            "project": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "description"
+                ],
+                "properties": {
+                    "description": {
+                        "type": "string",
+                        "minLength": 6
+                    },
+                    "name": {
+                        "type": "string",
+                        "minLength": 6
+                    }
+                },
+                "description": ""
+            },
+            "projects": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "description"
+                ],
+                "properties": {
+                    "description": {
+                        "type": "string",
+                        "minLength": 6
+                    },
+                    "name": {
+                        "type": "string",
+                        "minLength": 6
+                    }
+                },
+                "description": ""
+            },
+            "refresh-token": {
+                "type": "object",
+                "required": [
+                    "refresh-token"
+                ],
+                "properties": {
+                    "refresh-token": {
+                        "type": "string"
+                    }
+                },
+                "description": ""
+            },
+            "user": {
+                "type": "object",
+                "required": [
+                    "full_name"
+                ],
+                "properties": {
+                    "full_name": {
+                        "type": "string",
+                        "minLength": 6
+                    }
+                },
+                "description": ""
+            },
+            "users": {
+                "type": "object",
+                "required": [
+                    "username",
+                    "password",
+                    "confirm_password",
+                    "full_name"
+                ],
+                "properties": {
+                    "confirm_password": {
+                        "type": "string",
+                        "minLength": 6
+                    },
+                    "full_name": {
+                        "type": "string",
+                        "minLength": 6
+                    },
+                    "password": {
+                        "type": "string",
+                        "minLength": 6
+                    },
+                    "username": {
+                        "type": "string",
+                        "minLength": 6
+                    }
+                },
+                "description": ""
+            }
+        }
+    }
+}

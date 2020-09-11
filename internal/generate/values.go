@@ -24,7 +24,7 @@ func GenerateInteger(properties map[string]interface{}) int {
 	}
 
 	if _, present := properties["constant"]; present {
-		return properties["constant"].(int)
+		return int(properties["constant"].(float64))
 
 	}
 
@@ -33,23 +33,23 @@ func GenerateInteger(properties map[string]interface{}) int {
 	var min, max int
 
 	if _, present := properties["exclusiveMaximum"]; present {
-		max = properties["exclusiveMaximum"].(int) - 1
+		max = int(properties["exclusiveMaximum"].(float64)) - 1
 	}
 
 	if _, present := properties["exclusiveMinimum"]; present {
-		min = properties["exclusiveMinimum"].(int) + 1
+		min = int(properties["exclusiveMinimum"].(float64)) + 1
 	}
 
 	if _, present := properties["maximum"]; !present {
 		max = def.DummyDataRange["integer"].(map[string]int)["maximum"]
 	} else {
-		max = properties["maximum"].(int)
+		max = int(properties["maximum"].(float64))
 	}
 
 	if _, present := properties["minimum"]; !present {
 		min = def.DummyDataRange["integer"].(map[string]int)["minimum"]
 	} else {
-		min = properties["minimum"].(int)
+		min = int(properties["minimum"].(float64))
 	}
 
 	if _, present := properties["enum"]; present {
@@ -61,7 +61,7 @@ func GenerateInteger(properties map[string]interface{}) int {
 	}
 
 	if _, present := properties["multipleOf"]; present {
-		multipleOf := properties["multipleOf"].(int)
+		multipleOf := int(properties["multipleOf"].(float64))
 		i := 0
 		for {
 			eachMultiple := multipleOf * i
@@ -162,13 +162,13 @@ func GenerateString(properties map[string]interface{}) string {
 	if _, present := properties["maxLength"]; !present {
 		maxLength = def.DummyDataRange["string"].(map[string]int)["maxLength"]
 	} else {
-		maxLength = properties["maxLength"].(int)
+		maxLength = int(properties["maxLength"].(float64))
 	}
 
 	if _, present := properties["minLength"]; !present {
 		minLength = def.DummyDataRange["string"].(map[string]int)["minLength"]
 	} else {
-		minLength = properties["minLength"].(int)
+		minLength = int(properties["minLength"].(float64))
 	}
 
 	if _, present := properties["enum"]; present {
@@ -234,7 +234,7 @@ func GenerateArray(properties map[string]interface{}) interface{} {
 		if _, present := properties["maxItems"]; !present {
 			maxItems = def.DummyDataRange["array"].(map[string]int)["maximum"]
 		} else {
-			maxItems = properties["maxItems"].(int)
+			maxItems = int(properties["maxItems"].(float64))
 		}
 
 		// if _, present := properties["minItems"]; !present {
@@ -322,6 +322,7 @@ func GenerateObject(properties map[string]interface{}) map[string]interface{} {
 			} else if fieldType == "object" {
 				generatedObject[patternFieldName] = GenerateObject(fieldProperties.(map[string]interface{}))
 			} else {
+
 				generatedObject[patternFieldName] = FieldToGenerator[fieldType](fieldProperties.(map[string]interface{}))
 			}
 
@@ -350,7 +351,7 @@ func GenerateObject(properties map[string]interface{}) map[string]interface{} {
 
 	if len(generatedObject) == 0 {
 		if _, minPropertiesPresent := properties["minProperties"]; minPropertiesPresent {
-			minPropertiesPresent := properties["minProperties"].(int)
+			minPropertiesPresent := int(properties["minProperties"].(float64))
 
 			for i := 0; i < minPropertiesPresent; i++ {
 				generatedObject["test"+strconv.Itoa(i)] = i

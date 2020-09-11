@@ -2,59 +2,106 @@ package watch
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"os"
 	"service-watch/internal/def"
-	"service-watch/internal/models"
+	"service-watch/internal/heartbeat"
 
-	"github.com/BurntSushi/toml"
+	"github.com/getkin/kin-openapi/openapi3"
 )
 
-//TODO Swagger Parsing, traversal... after Anish finishes deploying swagger
-
 type ServiceWatcher struct {
-	ConfigPath string
-	AppConfig  models.AppConfig
+	SwaggerConfig *openapi3.Swagger
+	Timeout       int
 }
 
-//Init initializes ServiceWatcher.
-func (s *ServiceWatcher) Init(configPath string) {
-	s.ConfigPath = configPath
+//NewServiceWatcher returns new ServiceWatcher instance.
+func NewServiceWatcher(configPath string) (*ServiceWatcher, error) {
+	configFile, err := os.Open(configPath)
+
+	if err != nil {
+		return &ServiceWatcher{}, err
+	}
+
+	var watchConfig map[string]interface{}
+
+	watchConfigByte, _ := ioutil.ReadAll(configFile)
+
+	json.Unmarshal(watchConfigByte, &watchConfig)
+
+	configFile.Close()
+
+	//TODO uncomment once Anish corrects bugs on toml-swagger
+
+	// ep := watchConfig["host"].(string) + watchConfig["endpoint"].(string)
+
+	// resp, err := http.Get(ep)
+
+	// if err != nil {
+	// 	return &ServiceWatcher{}, err
+	// }
+
+	// body, err := ioutil.ReadAll(resp.Body)
+
+	// if err != nil {
+	// 	return &ServiceWatcher{}, err
+	// }
+
+	// resp.Body.Close()
+
+	openApiFile, err := os.Open("config/test-openapi.json")
+
+	if err != nil {
+		panic(err)
+	}
+
+	byteValue, _ := ioutil.ReadAll(openApiFile)
+
+	swagger, err := openapi3.NewSwaggerLoader().LoadSwaggerFromData(byteValue)
+	if err != nil {
+		return &ServiceWatcher{}, err
+	}
+
+	openApiFile.Close()
+
+	return &ServiceWatcher{
+		SwaggerConfig: swagger,
+		Timeout:       int(watchConfig["timeout"].(float64)),
+	}, nil
+
 }
 
-//ReadConfig decodes config file and initialize app config.
-func (s *ServiceWatcher) ReadConfig() error {
+//ValidateAppSpecificRequirements validates app specific requirements.
+func (s *ServiceWatcher) ValidateAppSpecificRequirements() error {
 
-	var config map[string]interface{}
-
-	_, err := toml.DecodeFile(s.ConfigPath, &config)
-	if err != nil {
-		return err
+	if s.SwaggerConfig == nil {
+		return def.ErrSwaggerConfigUnregistered
 	}
-
-	bytesConfig, err := json.Marshal(config)
-	if err != nil {
-		return err
+	if len(s.SwaggerConfig.Servers) == 0 {
+		return def.ErrServersUnregistered
 	}
-
-	appConfig := models.AppConfig{}
-
-	err = json.Unmarshal(bytesConfig, &appConfig)
-	if err != nil {
-		return err
-	}
-
-	s.AppConfig = appConfig
 
 	return nil
-}
 
-//TODO Watch
+}
 
 //Watch watches overall working of the apis.
 func (s *ServiceWatcher) Watch() error {
 
-	if s.AppConfig.Api == nil {
-		return def.ErrAppConfigUnregistered
+	err := s.ValidateAppSpecificRequirements()
+
+	if err != nil {
+		return err
 	}
+
+	serverURL := s.SwaggerConfig.Servers[0].URL
+
+	var config = map[string]interface{}{
+		"host":    serverURL,
+		"timeout": s.Timeout,
+	}
+
+	heartbeat.SendHeartBeart(s.SwaggerConfig, config)
 
 	return nil
 }
