@@ -32,8 +32,6 @@ func SendHeartBeart(swaggerConfig *openapi3.Swagger, config map[string]interface
 							json.Unmarshal(schemaBytes, &schema)
 							dummyData := generate.GenerateObject(schema)
 
-							fmt.Println(methodProperties.Security)
-
 							response, _ := httpClient.ExecuteRequest(method, ep, dummyData, map[string]string{"Authorization": access_token})
 
 							fmt.Println("--------------------------------")
