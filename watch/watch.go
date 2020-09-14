@@ -2,11 +2,11 @@ package watch
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"reflect"
 	"service-watch/internal/def"
+	"service-watch/internal/heartbeat"
 	"service-watch/internal/loader"
 	"service-watch/internal/models"
 
@@ -104,13 +104,13 @@ func (s *ServiceWatcher) Watch() error {
 		return err
 	}
 
-	// serverURL := s.ApiConfiguration.Server
-	// var config = map[string]interface{}{
-	// 	"host":    serverURL,
-	// 	"timeout": s.Timeout,
-	// }
+	serverURL := s.ApiConfiguration.Server
+	var config = map[string]interface{}{
+		"host":    serverURL,
+		"timeout": s.Timeout,
+	}
 
-	fmt.Println(s.ApiConfiguration.Endpoints)
+	heartbeat.ProcessRequest(s.ApiConfiguration, config)
 
 	return nil
 }

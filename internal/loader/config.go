@@ -37,29 +37,48 @@ func LoadSwagger(swaggerConfig *openapi3.Swagger) (*models.AppConfig, error) {
 
 	}
 
-	for _, eachChildEndpoints := range endpoints {
+	appSpecificEndpoints := make(map[string][]map[string]models.Endpoint)
+
+	for root, eachChildEndpoints := range endpoints {
+
+		appSpecificEndpoints[root] = []map[string]models.Endpoint{}
+
+		bufferEndpoints := make([]map[string]models.Endpoint, 0)
 
 		for _, eachChildEp := range eachChildEndpoints {
+
+			bufferChildEp := make(map[string]models.Endpoint)
 
 			for eachChildEpName, eachChildProp := range eachChildEp {
 				if _, epPresent := swaggerConfig.Paths[eachChildEpName]; epPresent {
 
+					bufferModel := &models.Endpoint{}
+
 					for _, eachOrderedMethod := range def.OrderedMethods {
 
 						if _, operationPresent := swaggerConfig.Paths[eachChildEpName].Operations()[eachOrderedMethod]; operationPresent {
-							eachChildProp.Methods = append(eachChildProp.Methods, map[string]*openapi3.Operation{eachOrderedMethod: swaggerConfig.Paths[eachChildEpName].Operations()[eachOrderedMethod]})
+							bufferModel.Methods = append(bufferModel.Methods, map[string]*openapi3.Operation{eachOrderedMethod: swaggerConfig.Paths[eachChildEpName].Operations()[eachOrderedMethod]})
 						}
 					}
-					eachChildEp[eachChildEpName] = eachChildProp
+
+					bufferModel.Root = eachChildProp.Root
+
+					bufferChildEp[eachChildEpName] = *bufferModel
 
 				}
 			}
+
+			bufferEndpoints = append(bufferEndpoints, bufferChildEp)
+
 		}
+
+		appSpecificEndpoints[root] = bufferEndpoints
 
 	}
 
-	appConfig.Endpoints = endpoints
+	appConfig.Endpoints = appSpecificEndpoints
 	appConfig.Server = swaggerConfig.Servers[0].URL
+	appConfig.Components = swaggerConfig.Components
 
 	return appConfig, nil
 

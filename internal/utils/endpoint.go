@@ -20,3 +20,17 @@ func EpRedundancyPresent(epoint string, epoints []map[string]models.Endpoint) bo
 	}
 	return false
 }
+
+func IsSpecificItem(ep string) (string, string, bool) {
+	epParts := strings.Split(ep, "/")
+
+	lastPart := epParts[len(epParts)-1]
+
+	isResource := ValidateResource(lastPart)
+
+	if isResource {
+		return strings.Join(epParts[0:len(epParts)-1], "/"), lastPart[1 : len(lastPart)-1], isResource
+	}
+
+	return "", "", isResource
+}
