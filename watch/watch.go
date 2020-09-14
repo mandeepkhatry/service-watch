@@ -2,17 +2,20 @@ package watch
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
+	"reflect"
 	"service-watch/internal/def"
-	"service-watch/internal/heartbeat"
+	"service-watch/internal/loader"
+	"service-watch/internal/models"
 
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
 type ServiceWatcher struct {
-	SwaggerConfig *openapi3.Swagger
-	Timeout       int
+	ApiConfiguration models.AppConfig
+	Timeout          int
 }
 
 //NewServiceWatcher returns new ServiceWatcher instance.
@@ -64,9 +67,15 @@ func NewServiceWatcher(configPath string) (*ServiceWatcher, error) {
 
 	openApiFile.Close()
 
+	appConfig, err := loader.LoadSwagger(swagger)
+
+	if err != nil {
+		return &ServiceWatcher{}, err
+	}
+
 	return &ServiceWatcher{
-		SwaggerConfig: swagger,
-		Timeout:       int(watchConfig["timeout"].(float64)),
+		ApiConfiguration: *appConfig,
+		Timeout:          int(watchConfig["timeout"].(float64)),
 	}, nil
 
 }
@@ -74,10 +83,11 @@ func NewServiceWatcher(configPath string) (*ServiceWatcher, error) {
 //ValidateAppSpecificRequirements validates app specific requirements.
 func (s *ServiceWatcher) ValidateAppSpecificRequirements() error {
 
-	if s.SwaggerConfig == nil {
+	if reflect.DeepEqual(s.ApiConfiguration, models.AppConfig{}) {
 		return def.ErrSwaggerConfigUnregistered
 	}
-	if len(s.SwaggerConfig.Servers) == 0 {
+
+	if len(s.ApiConfiguration.Server) == 0 {
 		return def.ErrServersUnregistered
 	}
 
@@ -94,14 +104,13 @@ func (s *ServiceWatcher) Watch() error {
 		return err
 	}
 
-	serverURL := s.SwaggerConfig.Servers[0].URL
+	// serverURL := s.ApiConfiguration.Server
+	// var config = map[string]interface{}{
+	// 	"host":    serverURL,
+	// 	"timeout": s.Timeout,
+	// }
 
-	var config = map[string]interface{}{
-		"host":    serverURL,
-		"timeout": s.Timeout,
-	}
-
-	heartbeat.SendHeartBeart(s.SwaggerConfig, config)
+	fmt.Println(s.ApiConfiguration.Endpoints)
 
 	return nil
 }
