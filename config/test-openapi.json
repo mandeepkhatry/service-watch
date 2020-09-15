@@ -180,45 +180,6 @@
                     }
                 }
             },
-            "post": {
-                "tags": [
-                    "plugin-type"
-                ],
-                "parameters": [{
-                    "name": "id",
-                    "in": "path",
-                    "description": "",
-                    "required": true,
-                    "deprecated": false,
-                    "allowEmptyValue": false,
-                    "schema": {
-                        "type": "string"
-                    }
-                }],
-                "requestBody": {
-                    "description": "",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/plugin-type"
-                            }
-                        }
-                    },
-                    "required": false
-                },
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-
-                                }
-                            }
-                        }
-                    }
-                }
-            },
             "put": {
                 "tags": [
                     "plugin-type"

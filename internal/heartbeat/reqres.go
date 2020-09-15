@@ -2,7 +2,6 @@ package heartbeat
 
 import (
 	"encoding/json"
-	"fmt"
 	"service-watch/internal/client"
 	"service-watch/internal/def"
 	"service-watch/internal/generate"
@@ -21,6 +20,7 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 	access_token := "Bearer " + loginResponse.Message.(map[string]interface{})["data"].(map[string]interface{})["access_token"].(string)
 
 	for root, childEps := range appConfig.Endpoints {
+
 		if root != "/login" {
 			for _, eachChildEp := range childEps {
 				for childEpName, childEpProp := range eachChildEp {
@@ -28,7 +28,7 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 					for _, eachMethod := range childEpProp.Methods {
 
 						for methodName, methodOperations := range eachMethod {
-							fmt.Println(childEpName, "-----", methodName)
+
 							if _, present := def.SchemaBasedMethods[methodName]; present {
 								if _, contentPresent := methodOperations.RequestBody.Value.Content["application/json"]; contentPresent {
 
@@ -41,7 +41,7 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 										schemaBytes, _ := appConfig.Components.Schemas[subcomponent].MarshalJSON()
 
 										json.Unmarshal(schemaBytes, &schema)
-										dummyData := generate.GenerateObject(schema)
+										dummyData := generate.GenerateDummyData(schema)
 
 										dBuffer := models.DataBuffer{}
 
@@ -63,7 +63,9 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 
 											dBuffer.AssignResponse(response.Message.(map[string]interface{}))
 
-											endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
+											if _, epNamePresent := endpointsDataBuffer[childEpName]; !epNamePresent {
+												endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
+											}
 
 											endpointsDataBuffer[childEpName][methodName] = dBuffer
 
@@ -72,13 +74,13 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 
 											dBuffer.AssignResponse(response.Message.(map[string]interface{}))
 
-											endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
+											if _, epNamePresent := endpointsDataBuffer[childEpName]; !epNamePresent {
+												endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
+											}
 
 											endpointsDataBuffer[childEpName][methodName] = dBuffer
 
 										}
-
-										fmt.Println(dBuffer)
 
 									}
 
@@ -95,13 +97,14 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 
 									resourceDisplacedEp := rootEp + "/" + resourceItem
 
-									fmt.Println(resourceDisplacedEp)
-
 									response, _ := httpClient.ExecuteRequest(methodName, resourceDisplacedEp, nil, map[string]string{"Authorization": access_token})
 
 									dBuffer.AssignResponse(response.Message.(map[string]interface{}))
 
-									endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
+									if _, epNamePresent := endpointsDataBuffer[childEpName]; !epNamePresent {
+										endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
+									}
+
 									endpointsDataBuffer[childEpName][methodName] = dBuffer
 
 								} else {
@@ -109,17 +112,20 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 
 									dBuffer.AssignResponse(response.Message.(map[string]interface{}))
 
-									endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
+									if _, epNamePresent := endpointsDataBuffer[childEpName]; !epNamePresent {
+										endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
+									}
+
 									endpointsDataBuffer[childEpName][methodName] = dBuffer
 
 								}
-								fmt.Println(dBuffer)
 
 							}
 
 						}
 
 					}
+
 				}
 			}
 
