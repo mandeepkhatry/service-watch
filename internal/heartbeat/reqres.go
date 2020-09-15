@@ -2,6 +2,7 @@ package heartbeat
 
 import (
 	"encoding/json"
+	"fmt"
 	"service-watch/internal/client"
 	"service-watch/internal/def"
 	"service-watch/internal/generate"
@@ -27,6 +28,7 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 					for _, eachMethod := range childEpProp.Methods {
 
 						for methodName, methodOperations := range eachMethod {
+							fmt.Println(childEpName, "-----", methodName)
 							if _, present := def.SchemaBasedMethods[methodName]; present {
 								if _, contentPresent := methodOperations.RequestBody.Value.Content["application/json"]; contentPresent {
 
@@ -76,20 +78,24 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 
 										}
 
+										fmt.Println(dBuffer)
+
 									}
 
 								}
 							} else {
 								//Methods GET/DELETE
-
+								dBuffer := models.DataBuffer{}
 								rootEp, resource, isSpecific := utils.IsSpecificItem(childEpName)
 								if isSpecific {
-									dBuffer := models.DataBuffer{}
+
 									//Check for root response for resource ids.
 
 									resourceItem := endpointsDataBuffer[rootEp]["POST"].Response["data"].(map[string]interface{})[resource].(string)
 
 									resourceDisplacedEp := rootEp + "/" + resourceItem
+
+									fmt.Println(resourceDisplacedEp)
 
 									response, _ := httpClient.ExecuteRequest(methodName, resourceDisplacedEp, nil, map[string]string{"Authorization": access_token})
 
@@ -98,7 +104,16 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 									endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
 									endpointsDataBuffer[childEpName][methodName] = dBuffer
 
+								} else {
+									response, _ := httpClient.ExecuteRequest(methodName, childEpName, nil, map[string]string{"Authorization": access_token})
+
+									dBuffer.AssignResponse(response.Message.(map[string]interface{}))
+
+									endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
+									endpointsDataBuffer[childEpName][methodName] = dBuffer
+
 								}
+								fmt.Println(dBuffer)
 
 							}
 

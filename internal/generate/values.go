@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Pallinder/go-randomdata"
+	"github.com/google/uuid"
 	"github.com/lucasjones/reggen"
 )
 
@@ -217,6 +218,8 @@ func GenerateStringFormat(stringType string) string {
 		return "2018-11-13"
 	} else if stringType == "email" {
 		return GenerateEmail()
+	} else if stringType == "uuid" {
+		return uuid.New().String()
 	}
 	return "unknown field"
 }
