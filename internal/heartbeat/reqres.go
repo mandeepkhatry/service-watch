@@ -2,7 +2,6 @@ package heartbeat
 
 import (
 	"encoding/json"
-	"fmt"
 	"service-watch/internal/client"
 	"service-watch/internal/def"
 	"service-watch/internal/generate"
@@ -49,78 +48,37 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 
 										dBuffer.AssignRequest(dummyData)
 
-										rootEp, resource, isSpecific := utils.IsSpecificItem(childEpName)
+										specificEndpoint := parser.GenerateSpecificEndpoint(childEpName, endpointsDataBuffer)
 
-										fmt.Println(parser.GenerateSpecificEndpoint(childEpName, endpointsDataBuffer))
+										response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, dummyData, map[string]string{"Authorization": access_token})
 
-										if isSpecific {
+										dBuffer.AssignResponse(response.Message.(map[string]interface{}))
 
-											//Check for root response for resource ids.
-
-											resourceItem := endpointsDataBuffer[rootEp]["POST"].Response["data"].(map[string]interface{})[resource].(string)
-
-											resourceDisplacedEp := rootEp + "/" + resourceItem
-
-											response, _ := httpClient.ExecuteRequest(methodName, resourceDisplacedEp, dummyData, map[string]string{"Authorization": access_token})
-
-											dBuffer.AssignResponse(response.Message.(map[string]interface{}))
-
-											if _, epNamePresent := endpointsDataBuffer[childEpName]; !epNamePresent {
-												endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
-											}
-
-											endpointsDataBuffer[childEpName][methodName] = dBuffer
-
-										} else {
-											response, _ := httpClient.ExecuteRequest(methodName, childEpName, dummyData, map[string]string{"Authorization": access_token})
-
-											dBuffer.AssignResponse(response.Message.(map[string]interface{}))
-
-											if _, epNamePresent := endpointsDataBuffer[childEpName]; !epNamePresent {
-												endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
-											}
-
-											endpointsDataBuffer[childEpName][methodName] = dBuffer
-
+										if _, epNamePresent := endpointsDataBuffer[childEpName]; !epNamePresent {
+											endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
 										}
+
+										endpointsDataBuffer[childEpName][methodName] = dBuffer
 
 									}
 
 								}
 							} else {
 								//Methods GET/DELETE
+
 								dBuffer := models.DataBuffer{}
-								rootEp, resource, isSpecific := utils.IsSpecificItem(childEpName)
-								if isSpecific {
 
-									//Check for root response for resource ids.
+								specificEndpoint := parser.GenerateSpecificEndpoint(childEpName, endpointsDataBuffer)
 
-									resourceItem := endpointsDataBuffer[rootEp]["POST"].Response["data"].(map[string]interface{})[resource].(string)
+								response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, nil, map[string]string{"Authorization": access_token})
 
-									resourceDisplacedEp := rootEp + "/" + resourceItem
+								dBuffer.AssignResponse(response.Message.(map[string]interface{}))
 
-									response, _ := httpClient.ExecuteRequest(methodName, resourceDisplacedEp, nil, map[string]string{"Authorization": access_token})
-
-									dBuffer.AssignResponse(response.Message.(map[string]interface{}))
-
-									if _, epNamePresent := endpointsDataBuffer[childEpName]; !epNamePresent {
-										endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
-									}
-
-									endpointsDataBuffer[childEpName][methodName] = dBuffer
-
-								} else {
-									response, _ := httpClient.ExecuteRequest(methodName, childEpName, nil, map[string]string{"Authorization": access_token})
-
-									dBuffer.AssignResponse(response.Message.(map[string]interface{}))
-
-									if _, epNamePresent := endpointsDataBuffer[childEpName]; !epNamePresent {
-										endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
-									}
-
-									endpointsDataBuffer[childEpName][methodName] = dBuffer
-
+								if _, epNamePresent := endpointsDataBuffer[childEpName]; !epNamePresent {
+									endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
 								}
+
+								endpointsDataBuffer[childEpName][methodName] = dBuffer
 
 							}
 

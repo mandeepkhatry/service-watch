@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"service-watch/internal/models"
 	"service-watch/internal/utils"
 	"strings"
@@ -64,15 +63,13 @@ func GenerateSpecificEndpoint(ep string, endpointsDataBuffer map[string]map[stri
 
 	if finalEp == "/" {
 		finalEp = ep
-	}
-
-	if !utils.ValidateResource(epParts[len(epParts)-1]) {
-		finalEp += epParts[len(epParts)-1]
 	} else {
-		finalEp = strings.TrimSuffix(finalEp, "/")
+		if !utils.ValidateResource(epParts[len(epParts)-1]) {
+			finalEp += epParts[len(epParts)-1]
+		} else {
+			finalEp = strings.TrimSuffix(finalEp, "/")
+		}
 	}
-
-	fmt.Println("FINAL :", finalEp)
 
 	return finalEp
 
