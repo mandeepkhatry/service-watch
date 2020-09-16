@@ -34,3 +34,8 @@ func IsSpecificItem(ep string) (string, string, bool) {
 
 	return "", "", isResource
 }
+
+func SeperateResource(epPart string) string {
+	s := strings.TrimPrefix(epPart, "{")
+	return strings.TrimSuffix(s, "}")
+}

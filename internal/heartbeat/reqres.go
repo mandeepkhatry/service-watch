@@ -2,10 +2,12 @@ package heartbeat
 
 import (
 	"encoding/json"
+	"fmt"
 	"service-watch/internal/client"
 	"service-watch/internal/def"
 	"service-watch/internal/generate"
 	"service-watch/internal/models"
+	"service-watch/internal/parser"
 	"service-watch/internal/utils"
 )
 
@@ -47,9 +49,9 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 
 										dBuffer.AssignRequest(dummyData)
 
-										//TODOImplment Security Options. Not present now in openapi test config. Also Protocol on Reponse Level has to be confirmed.
-
 										rootEp, resource, isSpecific := utils.IsSpecificItem(childEpName)
+
+										fmt.Println(parser.GenerateSpecificEndpoint(childEpName, endpointsDataBuffer))
 
 										if isSpecific {
 

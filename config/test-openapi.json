@@ -200,7 +200,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/plugin-type"
+                                "$ref": "#/components/schemas/plugin-types"
                             }
                         }
                     },
