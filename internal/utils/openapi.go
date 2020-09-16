@@ -4,8 +4,6 @@ import (
 	"strings"
 )
 
-//TODO recursive component finding
-
 func FindComponent(ref string) (string, string) {
 	references := strings.Split(ref, "/")
 

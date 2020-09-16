@@ -1,9 +1,14 @@
 package parser
 
 import (
+	"encoding/json"
+	"fmt"
+	"service-watch/internal/generate"
 	"service-watch/internal/models"
 	"service-watch/internal/utils"
 	"strings"
+
+	"github.com/getkin/kin-openapi/openapi3"
 )
 
 func ParseEndpoint(endpoint string) []string {
@@ -24,7 +29,7 @@ func ParseEndpoint(endpoint string) []string {
 	return roots
 }
 
-func GenerateSpecificEndpoint(ep string, endpointsDataBuffer map[string]map[string]models.DataBuffer) string {
+func GenerateSpecificEndpoint(ep string, endpointsDataBuffer map[string]map[string]models.DataBuffer, parameters openapi3.Parameters) string {
 
 	epParts := strings.Split(ep, "/")
 
@@ -69,6 +74,34 @@ func GenerateSpecificEndpoint(ep string, endpointsDataBuffer map[string]map[stri
 		} else {
 			finalEp = strings.TrimSuffix(finalEp, "/")
 		}
+	}
+
+	//Query Params
+	querySegments := make([]string, 0)
+	for _, params := range parameters {
+		if params.Value.In == "query" {
+
+			if params.Value.Schema != nil {
+
+				//Take data according to schema
+				var schema map[string]interface{}
+				schemaBytes, _ := params.Value.Schema.MarshalJSON()
+				json.Unmarshal(schemaBytes, &schema)
+
+				generatedData := generate.GenerateDummyData(schema)
+
+				querySegments = append(querySegments, params.Value.Name+"="+fmt.Sprintf("%v", generatedData[params.Value.Name]))
+			} else {
+				//Take data from data buffer
+				querySegments = append(querySegments, params.Value.Name+"="+fmt.Sprintf("%v", endpointsDataBuffer[finalEp]["POST"].Request[params.Value.Name]))
+			}
+
+		}
+	}
+
+	if len(querySegments) != 0 {
+		query := strings.Join(querySegments, "&")
+		finalEp += "?" + query
 	}
 
 	return finalEp

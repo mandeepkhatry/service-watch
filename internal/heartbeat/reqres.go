@@ -48,7 +48,7 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 
 										dBuffer.AssignRequest(dummyData)
 
-										specificEndpoint := parser.GenerateSpecificEndpoint(childEpName, endpointsDataBuffer)
+										specificEndpoint := parser.GenerateSpecificEndpoint(childEpName, endpointsDataBuffer, methodOperations.Parameters)
 
 										response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, dummyData, map[string]string{"Authorization": access_token})
 
@@ -68,7 +68,7 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 
 								dBuffer := models.DataBuffer{}
 
-								specificEndpoint := parser.GenerateSpecificEndpoint(childEpName, endpointsDataBuffer)
+								specificEndpoint := parser.GenerateSpecificEndpoint(childEpName, endpointsDataBuffer, methodOperations.Parameters)
 
 								response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, nil, map[string]string{"Authorization": access_token})
 
