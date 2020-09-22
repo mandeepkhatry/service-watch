@@ -60,6 +60,13 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 
 								response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, nil, map[string]string{"Authorization": access_token})
 
+								//Intercept for query
+								if len(methodOperations.Parameters) != 0 {
+									ep := parser.GenerateRequestQuery(specificEndpoint, methodOperations.Parameters, response)
+									response, _ = httpClient.ExecuteRequest(methodName, ep, nil, map[string]string{"Authorization": access_token})
+
+								}
+
 								dBuffer.AssignResponse(response.Message.(map[string]interface{}))
 
 								if _, epNamePresent := endpointsDataBuffer[childEpName]; !epNamePresent {
