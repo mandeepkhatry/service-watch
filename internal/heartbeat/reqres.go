@@ -1,13 +1,11 @@
 package heartbeat
 
 import (
-	"encoding/json"
 	"service-watch/internal/client"
 	"service-watch/internal/def"
-	"service-watch/internal/generate"
 	"service-watch/internal/models"
 	"service-watch/internal/parser"
-	"service-watch/internal/utils"
+	"service-watch/internal/schema"
 )
 
 func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) error {
@@ -33,37 +31,27 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 							if _, present := def.SchemaBasedMethods[methodName]; present {
 								if _, contentPresent := methodOperations.RequestBody.Value.Content["application/json"]; contentPresent {
 
-									component, subcomponent := utils.FindComponent(methodOperations.RequestBody.Value.Content["application/json"].Schema.Ref)
+									dummyData := schema.GenerateSchemaData(methodOperations.RequestBody.Value.Content["application/json"].Schema, appConfig.Components)
 
-									if component == "schemas" {
+									dBuffer := models.DataBuffer{}
 
-										var schema map[string]interface{}
+									dBuffer.AssignRequest(dummyData)
 
-										schemaBytes, _ := appConfig.Components.Schemas[subcomponent].MarshalJSON()
+									specificEndpoint := parser.GenerateSpecificEndpoint(childEpName, endpointsDataBuffer, methodOperations.Parameters)
 
-										json.Unmarshal(schemaBytes, &schema)
-										dummyData := generate.GenerateDummyData(schema)
+									response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, dummyData, map[string]string{"Authorization": access_token})
 
-										dBuffer := models.DataBuffer{}
+									dBuffer.AssignResponse(response.Message.(map[string]interface{}))
 
-										dBuffer.AssignRequest(dummyData)
-
-										specificEndpoint := parser.GenerateSpecificEndpoint(childEpName, endpointsDataBuffer, methodOperations.Parameters)
-
-										response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, dummyData, map[string]string{"Authorization": access_token})
-
-										dBuffer.AssignResponse(response.Message.(map[string]interface{}))
-
-										if _, epNamePresent := endpointsDataBuffer[childEpName]; !epNamePresent {
-											endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
-										}
-
-										endpointsDataBuffer[childEpName][methodName] = dBuffer
-
+									if _, epNamePresent := endpointsDataBuffer[childEpName]; !epNamePresent {
+										endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
 									}
+
+									endpointsDataBuffer[childEpName][methodName] = dBuffer
 
 								}
 							} else {
+
 								//Methods GET/DELETE
 
 								dBuffer := models.DataBuffer{}
