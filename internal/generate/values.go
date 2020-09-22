@@ -294,7 +294,6 @@ func GenerateArray(properties map[string]interface{}) interface{} {
 		} else if itemType == "object" {
 			return []interface{}{GenerateObject(properties["items"].(map[string]interface{}))}
 		}
-
 	}
 
 	return []string{}
@@ -365,6 +364,42 @@ func GenerateObject(properties map[string]interface{}) map[string]interface{} {
 
 		generatedObject["k1"] = "v1"
 		generatedObject["k2"] = "v2"
+	}
+
+	if _, present := properties["allOf"]; present {
+		for _, eachAllOfProp := range properties["allOf"].([]interface{}) {
+			for k, v := range GenerateObject(eachAllOfProp.(map[string]interface{})) {
+				generatedObject[k] = v
+			}
+		}
+	}
+
+	if _, present := properties["oneOf"]; present {
+		for _, eachAllOfProp := range properties["allOf"].([]interface{}) {
+			generatedObject = GenerateObject(eachAllOfProp.(map[string]interface{}))
+			break
+
+		}
+	}
+
+	if _, present := properties["anyOf"]; present {
+		for _, eachAllOfProp := range properties["anyOf"].([]interface{}) {
+			generatedObject = GenerateObject(eachAllOfProp.(map[string]interface{}))
+			break
+		}
+	}
+
+	//Generate object for then properties
+	if _, present := properties["then"]; present {
+		generatedObject = GenerateObject(properties["then"].(map[string]interface{})["properties"].(map[string]interface{}))
+	}
+
+	if _, present := properties["required"]; present {
+		object := make(map[string]interface{})
+		for _, eachRequiredField := range properties["required"].([]interface{}) {
+			object[eachRequiredField.(string)] = generatedObject[eachRequiredField.(string)]
+		}
+		return object
 	}
 
 	return generatedObject
