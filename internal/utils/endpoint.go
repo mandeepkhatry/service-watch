@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"service-watch/internal/def"
 	"service-watch/internal/models"
 	"strings"
 )
@@ -38,4 +39,10 @@ func IsSpecificItem(ep string) (string, string, bool) {
 func SeperateResource(epPart string) string {
 	s := strings.TrimPrefix(epPart, "{")
 	return strings.TrimSuffix(s, "}")
+}
+
+func DetachSecurityEndpoints(ep map[string][]map[string]models.Endpoint) {
+	for _, securityEp := range def.HTTPSecurityEndpoints {
+		delete(ep, securityEp)
+	}
 }
