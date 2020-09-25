@@ -5,3 +5,7 @@ var SchemaBasedMethods = map[string]bool{
 	"PUT":   true,
 	"PATCH": true,
 }
+
+var RearMostMethod = map[string]bool{
+	"DELETE": true,
+}

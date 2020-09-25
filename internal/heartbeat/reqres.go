@@ -26,16 +26,18 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 		utils.DetachSecurityEndpoints(appConfig.Endpoints)
 	}
 
+	//Deletion Methods
+	rearMostEndpointCollection := make(map[string]models.RearMostEndpoint)
+
 	requestConfig := requestconfig.NewRequestConfig(securityScheme.Response)
 
 	for _, childEps := range appConfig.Endpoints {
 
 		for _, eachChildEp := range childEps {
 			for childEpName, childEpProp := range eachChildEp {
-
+				fmt.Println("--------------------------------")
+				fmt.Println("Endpoint : ", childEpName)
 				for _, eachMethod := range childEpProp.Methods {
-					fmt.Println("--------------------------------")
-					fmt.Println("Endpoint : ", childEpName)
 
 					for methodName, methodOperations := range eachMethod {
 						fmt.Println("Method : ", methodName)
@@ -69,29 +71,44 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 
 							//Methods GET/DELETE
 
-							dBuffer := models.DataBuffer{}
+							if _, present := def.RearMostMethod[methodName]; present {
 
-							specificEndpoint := parser.GenerateSpecificEndpoint(childEpName, endpointsDataBuffer, methodOperations.Parameters)
+								specificEndpoint := parser.GenerateSpecificEndpoint(childEpName, endpointsDataBuffer, methodOperations.Parameters)
+								rearMostEp := models.RearMostEndpoint{
+									MethodName:       methodName,
+									SpecificEndpoint: specificEndpoint,
+									RequestBody:      nil,
+									RequestConfig:    requestConfig.Content,
+								}
 
-							response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, nil, requestConfig.Content)
+								rearMostEndpointCollection[childEpName] = rearMostEp
 
-							fmt.Println("----specific---- : ", specificEndpoint)
-							//Intercept for query
-							if len(methodOperations.Parameters) != 0 {
-								ep := parser.GenerateRequestQuery(specificEndpoint, methodOperations.Parameters, response)
+							} else {
+								dBuffer := models.DataBuffer{}
 
-								response, _ = httpClient.ExecuteRequest(methodName, ep, nil, requestConfig.Content)
+								specificEndpoint := parser.GenerateSpecificEndpoint(childEpName, endpointsDataBuffer, methodOperations.Parameters)
+
+								response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, nil, requestConfig.Content)
+
+								fmt.Println("----specific---- : ", specificEndpoint)
+								//Intercept for query
+								if len(methodOperations.Parameters) != 0 {
+									ep := parser.GenerateRequestQuery(specificEndpoint, methodOperations.Parameters, response)
+
+									response, _ = httpClient.ExecuteRequest(methodName, ep, nil, requestConfig.Content)
+
+								}
+								fmt.Println(response)
+
+								dBuffer.AssignResponse(response.Message.(map[string]interface{}))
+
+								if _, epNamePresent := endpointsDataBuffer[childEpName]; !epNamePresent {
+									endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
+								}
+
+								endpointsDataBuffer[childEpName][methodName] = dBuffer
 
 							}
-							fmt.Println(response)
-
-							dBuffer.AssignResponse(response.Message.(map[string]interface{}))
-
-							if _, epNamePresent := endpointsDataBuffer[childEpName]; !epNamePresent {
-								endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
-							}
-
-							endpointsDataBuffer[childEpName][methodName] = dBuffer
 
 						}
 
@@ -102,6 +119,15 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 			}
 		}
 
+	}
+
+	for ep, epProperties := range rearMostEndpointCollection {
+		fmt.Println("--------------------------------")
+		fmt.Println("Endpoint : ", ep)
+		fmt.Println("Method : ", epProperties.MethodName)
+		response, _ := httpClient.ExecuteRequest(epProperties.MethodName, epProperties.SpecificEndpoint, epProperties.RequestBody, epProperties.RequestConfig)
+		fmt.Println("----specific---- : ", epProperties.SpecificEndpoint)
+		fmt.Println(response)
 	}
 
 	return nil
