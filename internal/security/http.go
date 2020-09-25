@@ -3,6 +3,7 @@ package security
 import (
 	"service-watch/internal/client"
 	"service-watch/internal/def"
+	"service-watch/internal/utils"
 )
 
 type HTTPAuthenticationScheme struct {
@@ -12,6 +13,7 @@ type HTTPAuthenticationScheme struct {
 }
 
 func (s *HTTPAuthenticationScheme) Run() {
-	res, _ := s.HttpClient.ExecuteRequest("POST", def.HTTPSecurityEndpoints[0], def.HTTPSecurityCredentials, nil)
+
+	res, _ := s.HttpClient.ExecuteRequest("POST", def.HTTPSecurityEndpoints[0], utils.ConvertMap(def.HTTPSecurityCredentials), nil)
 	s.Response = res.Message.(map[string]interface{})
 }

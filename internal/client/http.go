@@ -25,7 +25,7 @@ func NewHTTPClient(config map[string]interface{}) *HTTPClient {
 	}
 }
 
-func (c *HTTPClient) ExecuteRequest(method string, endpoint string, requestBody map[string]interface{}, requestConfig map[string]string) (models.HeartBeatResponse, error) {
+func (c *HTTPClient) ExecuteRequest(method string, endpoint string, buffer *bytes.Buffer, requestConfig map[string]string) (models.HeartBeatResponse, error) {
 
 	var req *http.Request
 	var err error
@@ -34,21 +34,16 @@ func (c *HTTPClient) ExecuteRequest(method string, endpoint string, requestBody 
 
 	start := time.Now()
 
-	if requestBody != nil {
-
-		requestBytes, err := json.Marshal(requestBody)
+	if buffer != nil {
+		req, err = http.NewRequest(method, url, buffer)
 		if err != nil {
+
 			return models.HeartBeatResponse{}, err
 		}
-
-		req, err = http.NewRequest(method, url, bytes.NewBuffer(requestBytes))
-		if err != nil {
-			return models.HeartBeatResponse{}, err
-		}
-
 	} else {
 		req, err = http.NewRequest(method, url, nil)
 		if err != nil {
+
 			return models.HeartBeatResponse{}, err
 		}
 	}

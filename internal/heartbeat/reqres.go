@@ -3,11 +3,11 @@ package heartbeat
 import (
 	"fmt"
 	"service-watch/internal/client"
+	"service-watch/internal/content"
 	"service-watch/internal/def"
 	"service-watch/internal/models"
 	"service-watch/internal/parser"
 	"service-watch/internal/requestconfig"
-	"service-watch/internal/schema"
 	"service-watch/internal/security"
 	"service-watch/internal/utils"
 )
@@ -44,29 +44,28 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 
 						if _, present := def.SchemaBasedMethods[methodName]; present {
 
-							if _, contentPresent := methodOperations.RequestBody.Value.Content["application/json"]; contentPresent {
+							contentType := content.GetContent(methodOperations.RequestBody.Value.Content)
 
-								dummyData := schema.GenerateSchemaData(methodOperations.RequestBody.Value.Content["application/json"].Schema, appConfig.Components)
+							buffer, _ := content.ContentBasedData[contentType](methodOperations.RequestBody.Value.Content[contentType].Schema, appConfig.Components)
 
-								dBuffer := models.DataBuffer{}
+							dBuffer := models.DataBuffer{}
 
-								dBuffer.AssignRequest(dummyData)
+							dBuffer.AssignRequest(utils.ConvertBuffer(buffer))
 
-								specificEndpoint := parser.GenerateSpecificEndpoint(childEpName, endpointsDataBuffer, methodOperations.Parameters)
+							specificEndpoint := parser.GenerateSpecificEndpoint(childEpName, endpointsDataBuffer, methodOperations.Parameters)
 
-								response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, dummyData, requestConfig.Content)
+							response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, buffer, requestConfig.Content)
 
-								fmt.Println(response)
+							fmt.Println(response)
 
-								dBuffer.AssignResponse(response.Message.(map[string]interface{}))
+							dBuffer.AssignResponse(response.Message.(map[string]interface{}))
 
-								if _, epNamePresent := endpointsDataBuffer[childEpName]; !epNamePresent {
-									endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
-								}
-
-								endpointsDataBuffer[childEpName][methodName] = dBuffer
-
+							if _, epNamePresent := endpointsDataBuffer[childEpName]; !epNamePresent {
+								endpointsDataBuffer[childEpName] = make(map[string]models.DataBuffer)
 							}
+
+							endpointsDataBuffer[childEpName][methodName] = dBuffer
+
 						} else {
 
 							//Methods GET/DELETE
@@ -84,15 +83,16 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 								rearMostEndpointCollection[childEpName] = rearMostEp
 
 							} else {
+
 								dBuffer := models.DataBuffer{}
 
 								specificEndpoint := parser.GenerateSpecificEndpoint(childEpName, endpointsDataBuffer, methodOperations.Parameters)
 
 								response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, nil, requestConfig.Content)
 
-								fmt.Println("----specific---- : ", specificEndpoint)
 								//Intercept for query
 								if len(methodOperations.Parameters) != 0 {
+
 									ep := parser.GenerateRequestQuery(specificEndpoint, methodOperations.Parameters, response)
 
 									response, _ = httpClient.ExecuteRequest(methodName, ep, nil, requestConfig.Content)
@@ -121,11 +121,12 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 
 	}
 
+	//Deletion Method considered as RearMostEnd
 	for ep, epProperties := range rearMostEndpointCollection {
 		fmt.Println("--------------------------------")
 		fmt.Println("Endpoint : ", ep)
 		fmt.Println("Method : ", epProperties.MethodName)
-		response, _ := httpClient.ExecuteRequest(epProperties.MethodName, epProperties.SpecificEndpoint, epProperties.RequestBody, epProperties.RequestConfig)
+		response, _ := httpClient.ExecuteRequest(epProperties.MethodName, epProperties.SpecificEndpoint, utils.ConvertMap(epProperties.RequestBody), epProperties.RequestConfig)
 		fmt.Println("----specific---- : ", epProperties.SpecificEndpoint)
 		fmt.Println(response)
 	}
