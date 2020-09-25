@@ -1,6 +1,7 @@
 package heartbeat
 
 import (
+	"fmt"
 	"service-watch/internal/client"
 	"service-watch/internal/def"
 	"service-watch/internal/models"
@@ -33,8 +34,11 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 			for childEpName, childEpProp := range eachChildEp {
 
 				for _, eachMethod := range childEpProp.Methods {
+					fmt.Println("--------------------------------")
+					fmt.Println("Endpoint : ", childEpName)
 
 					for methodName, methodOperations := range eachMethod {
+						fmt.Println("Method : ", methodName)
 
 						if _, present := def.SchemaBasedMethods[methodName]; present {
 
@@ -49,6 +53,8 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 								specificEndpoint := parser.GenerateSpecificEndpoint(childEpName, endpointsDataBuffer, methodOperations.Parameters)
 
 								response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, dummyData, requestConfig.Content)
+
+								fmt.Println(response)
 
 								dBuffer.AssignResponse(response.Message.(map[string]interface{}))
 
@@ -69,12 +75,15 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 
 							response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, nil, requestConfig.Content)
 
+							fmt.Println("----specific---- : ", specificEndpoint)
 							//Intercept for query
 							if len(methodOperations.Parameters) != 0 {
 								ep := parser.GenerateRequestQuery(specificEndpoint, methodOperations.Parameters, response)
+
 								response, _ = httpClient.ExecuteRequest(methodName, ep, nil, requestConfig.Content)
 
 							}
+							fmt.Println(response)
 
 							dBuffer.AssignResponse(response.Message.(map[string]interface{}))
 

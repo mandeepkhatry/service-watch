@@ -41,7 +41,10 @@ func GenerateSpecificEndpoint(ep string, endpointsDataBuffer map[string]map[stri
 
 	epParts = epParts[1:]
 
+	resultingEp := "/"
+
 	for i, epPart := range epParts {
+
 		if utils.ValidateResource(epPart) {
 
 			root := finalEp + strings.Join(epParts[current:i], "/")
@@ -50,15 +53,29 @@ func GenerateSpecificEndpoint(ep string, endpointsDataBuffer map[string]map[stri
 
 			if oneTimePost {
 				//epPart is resource since already validated
+
 				resource = endpointsDataBuffer[root]["POST"].Response["data"].(map[string]interface{})[utils.SeperateResource(epPart)].(string)
+
 				oneTimePost = false
 			} else {
-				resource = endpointsDataBuffer[root]["GET"].Response["data"].(map[string]interface{})[utils.SeperateResource(epPart)].(string)
+
+				responseData := endpointsDataBuffer[root]["GET"].Response["data"]
+
+				dataType := fmt.Sprintf("%T", responseData)
+
+				if dataType == "map[string]interface {}" {
+					resource = responseData.(map[string]interface{})[utils.SeperateResource(epPart)].(string)
+
+				} else if dataType == "[]interface {}" {
+
+					resource = responseData.([]interface{})[0].(map[string]interface{})[utils.SeperateResource(epPart)].(string)
+				}
 			}
 
-			finalEp = root + "/" + resource + "/"
+			resultingEp += (epParts[current] + "/" + resource + "/")
 
-			if i <= len(epPart)-1 {
+			if i+1 < len(epPart) {
+				finalEp = root + "/" + epPart + "/"
 				current = i + 1
 			}
 
@@ -66,17 +83,17 @@ func GenerateSpecificEndpoint(ep string, endpointsDataBuffer map[string]map[stri
 
 	}
 
-	if finalEp == "/" {
-		finalEp = ep
+	if resultingEp == "/" {
+		resultingEp = ep
 	} else {
 		if !utils.ValidateResource(epParts[len(epParts)-1]) {
-			finalEp += epParts[len(epParts)-1]
+			resultingEp += epParts[len(epParts)-1]
 		} else {
-			finalEp = strings.TrimSuffix(finalEp, "/")
+			resultingEp = strings.TrimSuffix(resultingEp, "/")
 		}
 	}
 
-	return finalEp
+	return resultingEp
 
 }
 
@@ -111,6 +128,9 @@ func GenerateRequestQuery(ep string, parameters openapi3.Parameters, response mo
 
 	query := strings.Join(querySegments, "&")
 
-	return ep + "?" + query
+	if len(query) != 0 {
+		ep += "?" + query
+	}
 
+	return ep
 }

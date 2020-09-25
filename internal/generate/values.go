@@ -394,13 +394,13 @@ func GenerateObject(properties map[string]interface{}) map[string]interface{} {
 		generatedObject = GenerateObject(properties["then"].(map[string]interface{})["properties"].(map[string]interface{}))
 	}
 
-	if _, present := properties["required"]; present {
-		object := make(map[string]interface{})
-		for _, eachRequiredField := range properties["required"].([]interface{}) {
-			object[eachRequiredField.(string)] = generatedObject[eachRequiredField.(string)]
-		}
-		return object
-	}
+	// if _, present := properties["required"]; present {
+	// 	object := make(map[string]interface{})
+	// 	for _, eachRequiredField := range properties["required"].([]interface{}) {
+	// 		object[eachRequiredField.(string)] = generatedObject[eachRequiredField.(string)]
+	// 	}
+	// 	return object
+	// }
 
 	return generatedObject
 

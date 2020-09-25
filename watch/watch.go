@@ -52,7 +52,7 @@ func NewServiceWatcher(configPath string) (*ServiceWatcher, error) {
 
 	// resp.Body.Close()
 
-	openApiFile, err := os.Open("config/test-openapi.json")
+	openApiFile, err := os.Open("config/test.json")
 
 	if err != nil {
 		panic(err)
