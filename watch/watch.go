@@ -2,13 +2,13 @@ package watch
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"reflect"
 	"service-watch/internal/def"
 	"service-watch/internal/heartbeat"
 	"service-watch/internal/loader"
+	"service-watch/internal/logs"
 	"service-watch/internal/models"
 
 	"github.com/getkin/kin-openapi/openapi3"
@@ -111,13 +111,15 @@ func (s *ServiceWatcher) Watch() error {
 		"timeout": s.Timeout,
 	}
 
-	logs, err := heartbeat.ProcessRequest(s.ApiConfiguration, config)
+	log, err := heartbeat.ProcessRequest(s.ApiConfiguration, config)
 
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(logs)
+	l := logs.Log{Logs: log, Store: "badgerdb", Dir: "/badger"}
+
+	l.StoreLogs()
 
 	return nil
 }
