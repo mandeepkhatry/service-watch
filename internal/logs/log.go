@@ -14,6 +14,7 @@ type Log struct {
 }
 
 func (l *Log) StoreLogs() error {
+
 	store := store.Stores[l.Store](l.Dir)
 
 	responses := make([]interface{}, 0)

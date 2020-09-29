@@ -1,5 +1,7 @@
 {
     "host": "https://call-logs.raralabs.com",
     "endpoint": "/gokyo-kb/swaggerui?format=json",
+    "logs_dir": "/logs",
+    "store": "badgerdb",
     "timeout": 10
 }

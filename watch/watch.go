@@ -10,6 +10,7 @@ import (
 	"service-watch/internal/loader"
 	"service-watch/internal/logs"
 	"service-watch/internal/models"
+	"service-watch/internal/store"
 
 	"github.com/getkin/kin-openapi/openapi3"
 )
@@ -17,6 +18,8 @@ import (
 type ServiceWatcher struct {
 	ApiConfiguration models.AppConfig
 	Timeout          int
+	LogsDir          string
+	Store            string
 }
 
 //NewServiceWatcher returns new ServiceWatcher instance.
@@ -74,9 +77,15 @@ func NewServiceWatcher(configPath string) (*ServiceWatcher, error) {
 		return &ServiceWatcher{}, err
 	}
 
+	if _, storePresent := store.Stores[watchConfig["store"].(string)]; !storePresent {
+		return &ServiceWatcher{}, def.ErrStoreUnavailable
+	}
+
 	return &ServiceWatcher{
 		ApiConfiguration: *appConfig,
 		Timeout:          int(watchConfig["timeout"].(float64)),
+		LogsDir:          watchConfig["logs_dir"].(string),
+		Store:            watchConfig["store"].(string),
 	}, nil
 
 }
@@ -117,7 +126,7 @@ func (s *ServiceWatcher) Watch() error {
 		return err
 	}
 
-	l := logs.Log{Logs: log, Store: "badgerdb", Dir: "/badger"}
+	l := logs.Log{Logs: log, Store: s.Store, Dir: s.LogsDir}
 
 	l.StoreLogs()
 

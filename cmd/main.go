@@ -1,25 +1,24 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"service-watch/watch"
 )
 
 var configPath = "config/watch.json"
 
 func main() {
-	fmt.Println("Testing")
 
 	serviceWatch, err := watch.NewServiceWatcher(configPath)
 
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	err = serviceWatch.Watch()
 
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 }
