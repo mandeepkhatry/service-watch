@@ -5,4 +5,5 @@ type HeartBeatResponse struct {
 	StatusCode  int         `json:"code"`
 	Message     interface{} `json:"message"`
 	ElapsedTime string      `json:"elapsedtime"`
+	Timeout     bool        `json:"timeout"`
 }

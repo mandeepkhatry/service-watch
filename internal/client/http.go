@@ -58,6 +58,11 @@ func (c *HTTPClient) ExecuteRequest(method string, endpoint string, buffer *byte
 	res, err := c.Client.Do(req)
 
 	if err != nil {
+
+		if err == http.ErrHandlerTimeout {
+			return models.HeartBeatResponse{Timeout: true}, err
+		}
+
 		return models.HeartBeatResponse{}, err
 	}
 
@@ -74,7 +79,7 @@ func (c *HTTPClient) ExecuteRequest(method string, endpoint string, buffer *byte
 
 	elapsedTime := time.Since(start).String()
 
-	response := models.HeartBeatResponse{Status: res.Status, StatusCode: res.StatusCode, Message: message, ElapsedTime: elapsedTime}
+	response := models.HeartBeatResponse{Status: res.Status, StatusCode: res.StatusCode, Message: message, ElapsedTime: elapsedTime, Timeout: false}
 
 	res.Body.Close()
 
