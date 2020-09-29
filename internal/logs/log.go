@@ -16,28 +16,37 @@ type Log struct {
 func (l *Log) StoreLogs() error {
 	store := store.Stores[l.Store](l.Dir)
 
-	timestamp := time.Now()
-
-	timestampBytes := formatter.MarshalDateTime(timestamp)
-
 	responses := make([]interface{}, 0)
 
-	for _, response := range l.Logs {
+	recordsByStatus := make(map[string][]time.Time)
+
+	for status, response := range l.Logs {
+		if _, present := recordsByStatus[status]; !present {
+			recordsByStatus[status] = make([]time.Time, 0)
+		}
+		for _, eachResponse := range response {
+			recordsByStatus[status] = append(recordsByStatus[status], eachResponse.(map[string]interface{})["timestamp"].(time.Time))
+		}
 		responses = append(responses, response...)
 	}
 
 	keys := make([][]byte, 0)
 	values := make([][]byte, 0)
 
-	responsesBytes, _ := json.Marshal(responses)
+	for _, response := range responses {
 
-	keys = append(keys, timestampBytes)
-	values = append(values, responsesBytes)
+		timestampByte := formatter.MarshalDateTime(response.(map[string]interface{})["timestamp"].(time.Time))
+		keys = append(keys, []byte("timestamp:"+string(timestampByte)))
 
-	for status, responses := range l.Logs {
+		responseByte, _ := json.Marshal(response)
+		values = append(values, responseByte)
+
+	}
+
+	for status, recordTimstamps := range recordsByStatus {
 		keys = append(keys, []byte("status:"+status))
-		responsesBytes, _ := json.Marshal(responses)
-		values = append(values, responsesBytes)
+		timestampsBytes, _ := json.Marshal(recordTimstamps)
+		values = append(values, timestampsBytes)
 	}
 
 	return store.PutBatch(keys, values)

@@ -3,6 +3,7 @@ package utils
 import (
 	"service-watch/internal/def"
 	"service-watch/internal/models"
+	"time"
 )
 
 func LogExtract(ep string, method string, response models.HeartBeatResponse) (string, map[string]interface{}) {
@@ -19,6 +20,8 @@ func LogExtract(ep string, method string, response models.HeartBeatResponse) (st
 		}
 	}
 
+	timestamp := time.Now()
+
 	return status, map[string]interface{}{
 		"endpoint":    ep,
 		"method":      method,
@@ -27,5 +30,6 @@ func LogExtract(ep string, method string, response models.HeartBeatResponse) (st
 		"message":     response.Message,
 		"elapsedtime": response.ElapsedTime,
 		"timeout":     response.Timeout,
+		"timestamp":   timestamp,
 	}
 }

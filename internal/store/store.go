@@ -3,7 +3,7 @@ package store
 //Store interface
 type Store interface {
 	//NewClient creates a new db client
-	NewClient(dbDIR string) error
+	NewClient(dir string) error
 	//CloseClient closes DB client
 	CloseClient() error
 	//Put inserts key,val to DB

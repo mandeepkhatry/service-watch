@@ -13,18 +13,18 @@ type StoreClient struct {
 	DB *badger.DB
 }
 
-func (s *StoreClient) NewClient(dbDIR string) error {
+func (s *StoreClient) NewClient(dir string) error {
 	pwd, err := os.Getwd()
 	if err != nil {
 		return err
 	}
-	dbDIR = filepath.Join(pwd, dbDIR)
-	err = os.MkdirAll(dbDIR, os.ModePerm)
+	dir = filepath.Join(pwd, dir)
+	err = os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
 		return err
 	}
 
-	defaultOptions := badger.DefaultOptions(dbDIR)
+	defaultOptions := badger.DefaultOptions(dir)
 	defaultOptions.Truncate = true
 	db, err := badger.Open(defaultOptions)
 	if err != nil {

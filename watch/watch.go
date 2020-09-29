@@ -35,7 +35,7 @@ func NewServiceWatcher(configPath string) (*ServiceWatcher, error) {
 
 	configFile.Close()
 
-	//TODO uncomment once Anish corrects bugs on toml-swagger
+	//Comment for now...
 
 	// ep := watchConfig["host"].(string) + watchConfig["endpoint"].(string)
 
