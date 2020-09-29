@@ -12,7 +12,7 @@ import (
 	"service-watch/internal/utils"
 )
 
-func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) error {
+func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) (map[string][]interface{}, error) {
 
 	httpClient := client.NewHTTPClient(config)
 
@@ -25,6 +25,14 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 		securityScheme.Run()
 		utils.DetachSecurityEndpoints(appConfig.Endpoints)
 	}
+
+	/**
+	Logs format
+		key : status ["timeout", "success", "failure"]
+		value : array of corresponding response
+
+	**/
+	logs := make(map[string][]interface{})
 
 	//Deletion Methods
 	rearMostEndpointCollection := make(map[string]models.RearMostEndpoint)
@@ -56,7 +64,15 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 
 							response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, buffer, requestConfig.Content)
 
-							fmt.Println(response)
+							//Find status of endpoint and append to logs accordingly
+
+							status, log := utils.LogExtract(childEpName, methodName, response)
+
+							if _, logKeyPresent := logs[status]; !logKeyPresent {
+								logs[status] = make([]interface{}, 0)
+							}
+
+							logs[status] = append(logs[status], log)
 
 							dBuffer.AssignResponse(response.Message.(map[string]interface{}))
 
@@ -100,6 +116,16 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 								}
 								fmt.Println(response)
 
+								//Find status of endpoint and append to logs accordingly
+
+								status, log := utils.LogExtract(childEpName, methodName, response)
+
+								if _, logKeyPresent := logs[status]; !logKeyPresent {
+									logs[status] = make([]interface{}, 0)
+								}
+
+								logs[status] = append(logs[status], log)
+
 								dBuffer.AssignResponse(response.Message.(map[string]interface{}))
 
 								if _, epNamePresent := endpointsDataBuffer[childEpName]; !epNamePresent {
@@ -129,8 +155,17 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) e
 		response, _ := httpClient.ExecuteRequest(epProperties.MethodName, epProperties.SpecificEndpoint, utils.ConvertMap(epProperties.RequestBody), epProperties.RequestConfig)
 		fmt.Println("----specific---- : ", epProperties.SpecificEndpoint)
 		fmt.Println(response)
+		//Find status of endpoint and append to logs accordingly
+
+		status, log := utils.LogExtract(ep, epProperties.MethodName, response)
+
+		if _, logKeyPresent := logs[status]; !logKeyPresent {
+			logs[status] = make([]interface{}, 0)
+		}
+
+		logs[status] = append(logs[status], log)
 	}
 
-	return nil
+	return logs, nil
 
 }

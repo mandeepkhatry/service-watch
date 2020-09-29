@@ -2,6 +2,7 @@ package watch
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -110,7 +111,13 @@ func (s *ServiceWatcher) Watch() error {
 		"timeout": s.Timeout,
 	}
 
-	heartbeat.ProcessRequest(s.ApiConfiguration, config)
+	logs, err := heartbeat.ProcessRequest(s.ApiConfiguration, config)
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(logs)
 
 	return nil
 }
