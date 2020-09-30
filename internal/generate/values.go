@@ -7,8 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Pallinder/go-randomdata"
-	"github.com/google/uuid"
 	"github.com/lucasjones/reggen"
 )
 
@@ -197,31 +195,9 @@ func GenerateString(properties map[string]interface{}) string {
 	return string(b)
 }
 
-func GenerateEmail() string {
-	var properties = map[string]interface{}{
-		"maxLength": 10,
-		"minLength": 5,
-	}
-	return GenerateString(properties) + "@xyz.com"
-}
-
 func GenerateStringFormat(stringType string) string {
-	if stringType == "ipv4" {
-		return randomdata.IpV4Address()
-	} else if stringType == "ipv6" {
-		return randomdata.IpV6Address()
-	} else if stringType == "date-time" {
-		return "2018-11-13T20:20:39+00:00"
-	} else if stringType == "time" {
-		return "20:20:39+00:00"
-	} else if stringType == "date" {
-		return "2018-11-13"
-	} else if stringType == "email" {
-		return GenerateEmail()
-	} else if stringType == "uuid" {
-		return uuid.New().String()
-	}
-	return "unknown field"
+	return def.StringFormat[stringType]
+
 }
 
 func GenerateRegex(regex string) string {
