@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"service-watch/internal/def"
+	"service-watch/internal/mime"
 
 	"github.com/getkin/kin-openapi/openapi3"
 )
@@ -35,7 +36,7 @@ func FindFileContent(configSchema *openapi3.SchemaRef, components openapi3.Compo
 
 					if _, encodingPresent := def.ContentEncoding[format]; encodingPresent {
 						if _, openAPIEncoding := encoding[field]; openAPIEncoding {
-							fileContent[field] = encoding[field].ContentType
+							fileContent[field] = mime.GetExtension(encoding[field].ContentType)
 						}
 					}
 				}
