@@ -54,13 +54,15 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) (
 
 							contentType := content.GetContent(methodOperations.RequestBody.Value.Content)
 
-							buffer, _ := content.ContentBasedData[contentType](methodOperations.RequestBody.Value.Content[contentType].Schema, methodOperations.RequestBody.Value.Content[contentType].Encoding, appConfig.Components)
+							buffer, contentType, _ := content.ContentBasedData[contentType](methodOperations.RequestBody.Value.Content[contentType].Schema, methodOperations.RequestBody.Value.Content[contentType].Encoding, appConfig.Components)
 
 							dBuffer := models.DataBuffer{}
 
 							dBuffer.AssignRequest(utils.ConvertBuffer(buffer))
 
 							specificEndpoint := parser.GenerateSpecificEndpoint(childEpName, endpointsDataBuffer, methodOperations.Parameters)
+
+							requestConfig.Content["Content-Type"] = contentType
 
 							response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, buffer, requestConfig.Content)
 
