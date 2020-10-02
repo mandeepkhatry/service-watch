@@ -13,7 +13,7 @@ func GenerateSchemaData(schema *openapi3.SchemaRef, components openapi3.Componen
 	dummyData := make(map[string]interface{})
 
 	if len(schema.Ref) != 0 {
-		component, subcomponent := utils.FindComponent((schema.Ref))
+		component, subcomponent := utils.FindComponent(schema.Ref)
 
 		if component == "schemas" {
 			var schema map[string]interface{}

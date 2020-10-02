@@ -52,7 +52,7 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) (
 
 						if _, present := def.SchemaBasedMethods[methodName]; present {
 
-							contentType := content.GetContent(methodOperations.RequestBody.Value.Content)
+							contentType := utils.GetContent(methodOperations.RequestBody.Value.Content)
 
 							buffer, contentType, _ := content.ContentBasedData[contentType](methodOperations.RequestBody.Value.Content[contentType].Schema, methodOperations.RequestBody.Value.Content[contentType].Encoding, appConfig.Components)
 
@@ -155,7 +155,6 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) (
 		fmt.Println("Endpoint : ", ep)
 		fmt.Println("Method : ", epProperties.MethodName)
 		response, _ := httpClient.ExecuteRequest(epProperties.MethodName, epProperties.SpecificEndpoint, utils.ConvertMap(epProperties.RequestBody), epProperties.RequestConfig)
-		fmt.Println("----specific---- : ", epProperties.SpecificEndpoint)
 		fmt.Println(response)
 		//Find status of endpoint and append to logs accordingly
 
