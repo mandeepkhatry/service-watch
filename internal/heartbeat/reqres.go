@@ -10,6 +10,8 @@ import (
 	"service-watch/internal/requestconfig"
 	"service-watch/internal/security"
 	"service-watch/internal/utils"
+	"service-watch/internal/validator"
+	"strconv"
 )
 
 func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) (map[string][]interface{}, error) {
@@ -66,9 +68,15 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) (
 
 							response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, buffer, requestConfig.Content)
 
+							openApiSchema := utils.GetCorrespondingSchema(strconv.Itoa(response.StatusCode), methodOperations.Responses, appConfig.Components)
+
+							responseValid, errorMessage, _ := validator.ValidateResponseWrtSchema(openApiSchema, response.Message.(map[string]interface{}))
+							response.ResponseValidity = true
+							response.ResponseValidityError = errorMessage
+
 							//Find status of endpoint and append to logs accordingly
 
-							status, log := utils.LogExtract(childEpName, methodName, response)
+							status, log := utils.LogExtract(childEpName, methodName, response, responseValid)
 
 							if _, logKeyPresent := logs[status]; !logKeyPresent {
 								logs[status] = make([]interface{}, 0)
@@ -118,9 +126,15 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) (
 								}
 								fmt.Println(response)
 
+								openApiSchema := utils.GetCorrespondingSchema(strconv.Itoa(response.StatusCode), methodOperations.Responses, appConfig.Components)
+
+								responseValid, errorMessage, _ := validator.ValidateResponseWrtSchema(openApiSchema, response.Message.(map[string]interface{}))
+								response.ResponseValidity = true
+								response.ResponseValidityError = errorMessage
+
 								//Find status of endpoint and append to logs accordingly
 
-								status, log := utils.LogExtract(childEpName, methodName, response)
+								status, log := utils.LogExtract(childEpName, methodName, response, responseValid)
 
 								if _, logKeyPresent := logs[status]; !logKeyPresent {
 									logs[status] = make([]interface{}, 0)
@@ -158,7 +172,7 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) (
 		fmt.Println(response)
 		//Find status of endpoint and append to logs accordingly
 
-		status, log := utils.LogExtract(ep, epProperties.MethodName, response)
+		status, log := utils.LogExtract(ep, epProperties.MethodName, response, true)
 
 		if _, logKeyPresent := logs[status]; !logKeyPresent {
 			logs[status] = make([]interface{}, 0)

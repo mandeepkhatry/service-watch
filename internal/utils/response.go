@@ -6,18 +6,23 @@ import (
 	"time"
 )
 
-func LogExtract(ep string, method string, response models.HeartBeatResponse) (string, map[string]interface{}) {
+func LogExtract(ep string, method string, response models.HeartBeatResponse, responseValid bool) (string, map[string]interface{}) {
 
 	status := ""
 
 	if response.StatusCode == 0 {
 		status = "timeout"
 	} else {
-		if _, present := def.AccpetedStatus[method][response.StatusCode]; present {
-			status = "success"
+		if !responseValid {
+			status = "invalid_response"
 		} else {
-			status = "failure"
+			if _, present := def.AccpetedStatus[method][response.StatusCode]; present {
+				status = "success"
+			} else {
+				status = "failure"
+			}
 		}
+
 	}
 
 	timestamp := time.Now()

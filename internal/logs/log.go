@@ -18,7 +18,6 @@ func (l *Log) StoreLogs() error {
 	store := store.Stores[l.Store](l.Dir)
 
 	responses := make([]interface{}, 0)
-
 	recordsByStatus := make(map[string][]time.Time)
 
 	for status, response := range l.Logs {
