@@ -5,10 +5,15 @@ import (
 )
 
 func ValidateResponseWrtSchema(schema map[string]interface{}, data map[string]interface{}) (bool, map[string]interface{}, error) {
-	loader := gojsonschema.NewGoLoader(schema)
-	dataLoader := gojsonschema.NewGoLoader(data)
 
 	errorMap := make(map[string]interface{})
+
+	if len(schema) == 0 {
+		return true, errorMap, nil
+	}
+
+	loader := gojsonschema.NewGoLoader(schema)
+	dataLoader := gojsonschema.NewGoLoader(data)
 
 	result, err := gojsonschema.Validate(loader, dataLoader)
 	if err != nil {

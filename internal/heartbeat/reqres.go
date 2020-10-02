@@ -71,7 +71,8 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) (
 							openApiSchema := utils.GetCorrespondingSchema(strconv.Itoa(response.StatusCode), methodOperations.Responses, appConfig.Components)
 
 							responseValid, errorMessage, _ := validator.ValidateResponseWrtSchema(openApiSchema, response.Message.(map[string]interface{}))
-							response.ResponseValidity = true
+
+							response.ResponseValidity = responseValid
 							response.ResponseValidityError = errorMessage
 
 							//Find status of endpoint and append to logs accordingly

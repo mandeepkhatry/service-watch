@@ -2,6 +2,7 @@ package watch
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -11,6 +12,7 @@ import (
 	"service-watch/internal/logs"
 	"service-watch/internal/models"
 	"service-watch/internal/store"
+	"time"
 
 	"github.com/getkin/kin-openapi/openapi3"
 )
@@ -20,6 +22,7 @@ type ServiceWatcher struct {
 	Timeout          int
 	LogsDir          string
 	Store            string
+	Periodicity      int
 }
 
 //NewServiceWatcher returns new ServiceWatcher instance.
@@ -86,6 +89,7 @@ func NewServiceWatcher(configPath string) (*ServiceWatcher, error) {
 		Timeout:          int(watchConfig["timeout"].(float64)),
 		LogsDir:          watchConfig["logs_dir"].(string),
 		Store:            watchConfig["store"].(string),
+		Periodicity:      int(watchConfig["periodicity"].(float64)),
 	}, nil
 
 }
@@ -120,15 +124,22 @@ func (s *ServiceWatcher) Watch() error {
 		"timeout": s.Timeout,
 	}
 
-	log, err := heartbeat.ProcessRequest(s.ApiConfiguration, config)
+	ticker := time.NewTicker(time.Duration(s.Periodicity) * time.Second)
 
-	if err != nil {
-		return err
+	storeLog := logs.NewLog(s.Store, s.LogsDir)
+
+	for range ticker.C {
+		fmt.Println("*******************************************************")
+		log, err := heartbeat.ProcessRequest(s.ApiConfiguration, config)
+
+		if err != nil {
+			return err
+		}
+
+		storeLog.StoreLogs(log)
+		fmt.Println("***********************************************************")
+
 	}
-
-	l := logs.Log{Logs: log, Store: s.Store, Dir: s.LogsDir}
-
-	l.StoreLogs()
 
 	return nil
 }

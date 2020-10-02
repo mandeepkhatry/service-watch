@@ -7,20 +7,24 @@ import (
 	"time"
 )
 
-type Log struct {
-	Logs  map[string][]interface{}
-	Store string
-	Dir   string
+type StoreLog struct {
+	Store store.Store
 }
 
-func (l *Log) StoreLogs() error {
+func NewLog(storeSpace string, dir string) *StoreLog {
+	return &StoreLog{
+		Store: store.Stores[storeSpace](dir),
+	}
+}
 
-	store := store.Stores[l.Store](l.Dir)
+func (l *StoreLog) StoreLogs(logs map[string][]interface{}) error {
+
+	store := l.Store
 
 	responses := make([]interface{}, 0)
 	recordsByStatus := make(map[string][]time.Time)
 
-	for status, response := range l.Logs {
+	for status, response := range logs {
 		if _, present := recordsByStatus[status]; !present {
 			recordsByStatus[status] = make([]time.Time, 0)
 		}
