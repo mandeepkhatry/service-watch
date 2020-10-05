@@ -19,6 +19,7 @@ var ContentBasedData = map[string]func(configSchema *openapi3.SchemaRef, encodin
 		if err != nil {
 			return bytes.NewBuffer([]byte{}), "", err
 		}
+
 		return bytes.NewBuffer(requestBytes), "application/json", nil
 	},
 	"multipart/form-data": func(configSchema *openapi3.SchemaRef, encoding map[string]*openapi3.Encoding, components openapi3.Components) (*bytes.Buffer, string, error) {

@@ -30,7 +30,7 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) (
 
 	/**
 	Logs format
-		key : status ["timeout", "success", "failure"]
+		key : status ["timeout", "success", "failure", "invalid_response"]
 		value : array of corresponding response
 
 	**/

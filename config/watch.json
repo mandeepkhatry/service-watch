@@ -3,6 +3,6 @@
     "endpoint": "/gokyo-kb/swaggerui?format=json",
     "logs_dir": "/logs",
     "store": "badgerdb",
-    "periodicity": 10,
+    "periodicity": 1,
     "timeout": 10
 }
