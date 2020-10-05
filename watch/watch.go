@@ -74,7 +74,7 @@ func NewServiceWatcher(configPath string) (*ServiceWatcher, error) {
 
 	openApiFile.Close()
 
-	appConfig, err := loader.LoadSwagger(swagger)
+	appConfig, err := loader.LoadSwagger(swagger, watchConfig)
 
 	if err != nil {
 		return &ServiceWatcher{}, err

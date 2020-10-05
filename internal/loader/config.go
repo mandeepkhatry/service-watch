@@ -9,30 +9,40 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
-func LoadSwagger(swaggerConfig *openapi3.Swagger) (*models.AppConfig, error) {
+func LoadSwagger(swaggerConfig *openapi3.Swagger, watchConfig map[string]interface{}) (*models.AppConfig, error) {
 
 	appConfig := &models.AppConfig{}
 
 	//Form : RootEndpoint : array of childs
 	endpoints := make(map[string][]map[string]models.Endpoint)
 
+	ignoreEndpoints := watchConfig["ignore_endpoints"].([]interface{})
+
+	endpointsIngnored := make(map[string]bool)
+
+	for _, v := range ignoreEndpoints {
+		endpointsIngnored[v.(string)] = true
+	}
+
 	for ep, _ := range swaggerConfig.Paths {
 
-		endpointParts := parser.ParseEndpoint(ep)
+		if _, present := endpointsIngnored[ep]; !present {
+			endpointParts := parser.ParseEndpoint(ep)
 
-		root := endpointParts[0]
+			root := endpointParts[0]
 
-		if _, present := endpoints[root]; !present {
-			endpoints[root] = []map[string]models.Endpoint{}
-		}
-
-		for _, eachEpPart := range endpointParts {
-
-			if !utils.EpRedundancyPresent(eachEpPart, endpoints[root]) {
-				endpoints[root] = append(endpoints[root], map[string]models.Endpoint{eachEpPart: models.Endpoint{Root: eachEpPart}})
-
+			if _, present := endpoints[root]; !present {
+				endpoints[root] = []map[string]models.Endpoint{}
 			}
 
+			for _, eachEpPart := range endpointParts {
+
+				if !utils.EpRedundancyPresent(eachEpPart, endpoints[root]) {
+					endpoints[root] = append(endpoints[root], map[string]models.Endpoint{eachEpPart: models.Endpoint{Root: eachEpPart}})
+
+				}
+
+			}
 		}
 
 	}
