@@ -1,15 +1,18 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"service-watch/watch"
 )
 
-var configPath = "config/watch.json"
-
 func main() {
 
-	serviceWatch, err := watch.NewServiceWatcher(configPath)
+	configPath := flag.String("config", "", "config path")
+
+	flag.Parse()
+
+	serviceWatch, err := watch.NewServiceWatcher(string(*configPath))
 
 	if err != nil {
 		log.Fatalln(err)

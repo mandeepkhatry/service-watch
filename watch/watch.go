@@ -88,14 +88,19 @@ func NewServiceWatcher(configPath string) (*ServiceWatcher, error) {
 
 	securityEndpoints := make([]string, 0)
 
-	for _, v := range watchConfig["security_endpoints"].([]interface{}) {
-		securityEndpoints = append(securityEndpoints, v.(string))
+	if _, present := watchConfig["security_endpoints"]; present {
+		for _, v := range watchConfig["security_endpoints"].([]interface{}) {
+			securityEndpoints = append(securityEndpoints, v.(string))
+		}
 	}
 
 	credentials := make(map[string]interface{})
 
-	for k, v := range watchConfig["credentials"].(map[string]interface{}) {
-		credentials[k] = v
+	if _, present := watchConfig["credentials"]; present {
+		for k, v := range watchConfig["credentials"].(map[string]interface{}) {
+			credentials[k] = v
+		}
+
 	}
 
 	return &ServiceWatcher{
