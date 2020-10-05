@@ -18,11 +18,13 @@ import (
 )
 
 type ServiceWatcher struct {
-	ApiConfiguration models.AppConfig
-	Timeout          int
-	LogsDir          string
-	Store            string
-	Periodicity      int
+	ApiConfiguration    models.AppConfig
+	Timeout             int
+	LogsDir             string
+	Store               string
+	Periodicity         int
+	SecurityEndpoints   []string
+	SecurityCredentials map[string]interface{}
 }
 
 //NewServiceWatcher returns new ServiceWatcher instance.
@@ -84,12 +86,26 @@ func NewServiceWatcher(configPath string) (*ServiceWatcher, error) {
 		return &ServiceWatcher{}, def.ErrStoreUnavailable
 	}
 
+	securityEndpoints := make([]string, 0)
+
+	for _, v := range watchConfig["security_endpoints"].([]interface{}) {
+		securityEndpoints = append(securityEndpoints, v.(string))
+	}
+
+	credentials := make(map[string]interface{})
+
+	for k, v := range watchConfig["credentials"].(map[string]interface{}) {
+		credentials[k] = v
+	}
+
 	return &ServiceWatcher{
-		ApiConfiguration: *appConfig,
-		Timeout:          int(watchConfig["timeout"].(float64)),
-		LogsDir:          watchConfig["logs_dir"].(string),
-		Store:            watchConfig["store"].(string),
-		Periodicity:      int(watchConfig["periodicity"].(float64)),
+		ApiConfiguration:    *appConfig,
+		Timeout:             int(watchConfig["timeout"].(float64)),
+		LogsDir:             watchConfig["logs_dir"].(string),
+		Store:               watchConfig["store"].(string),
+		Periodicity:         int(watchConfig["periodicity"].(float64)),
+		SecurityEndpoints:   securityEndpoints,
+		SecurityCredentials: credentials,
 	}, nil
 
 }
@@ -130,7 +146,7 @@ func (s *ServiceWatcher) Watch() error {
 
 	for range ticker.C {
 		fmt.Println("*******************************************************")
-		log, err := heartbeat.ProcessRequest(s.ApiConfiguration, config)
+		log, err := heartbeat.ProcessRequest(s.ApiConfiguration, config, s.SecurityEndpoints, s.SecurityCredentials)
 
 		if err != nil {
 			return err

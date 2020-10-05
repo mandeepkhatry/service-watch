@@ -5,6 +5,10 @@
     "store": "badgerdb",
     "periodicity": 1,
     "timeout": 10,
-    "ignore_endpoints": ["/login", "/refresh_token"]
-
+    "ignore_endpoints": ["/refresh_token"],
+    "security_endpoints": ["/login"],
+    "credentials": {
+        "username": "test_username",
+        "password": "test_password"
+    }
 }

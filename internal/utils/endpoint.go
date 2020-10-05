@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"service-watch/internal/def"
 	"service-watch/internal/models"
 	"strings"
 )
@@ -41,8 +40,8 @@ func SeperateResource(epPart string) string {
 	return strings.TrimSuffix(s, "}")
 }
 
-func DetachSecurityEndpoints(ep map[string][]map[string]models.Endpoint) {
-	for _, securityEp := range def.HTTPSecurityEndpoints {
+func DetachSecurityEndpoints(ep map[string][]map[string]models.Endpoint, securityEndpoints []string) {
+	for _, securityEp := range securityEndpoints {
 		delete(ep, securityEp)
 	}
 }

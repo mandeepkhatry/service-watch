@@ -14,18 +14,18 @@ import (
 	"strconv"
 )
 
-func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}) (map[string][]interface{}, error) {
+func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}, securityEndpoints []string, credentials map[string]interface{}) (map[string][]interface{}, error) {
 
 	httpClient := client.NewHTTPClient(config)
 
 	endpointsDataBuffer := make(map[string]map[string]models.DataBuffer)
 
-	securityScheme := security.HTTPAuthenticationScheme{HttpClient: httpClient}
+	securityScheme := security.HTTPAuthenticationScheme{HttpClient: httpClient, Credentials: credentials, SecurityEndpoints: securityEndpoints}
 
-	if security.ValidateSecuritySchemas(appConfig.Endpoints) {
-		securityScheme.Credentials = def.HTTPSecurityCredentials
+	if security.ValidateSecuritySchemas(appConfig.Endpoints, securityEndpoints, credentials) {
+		securityScheme.Credentials = credentials
 		securityScheme.Run()
-		utils.DetachSecurityEndpoints(appConfig.Endpoints)
+		utils.DetachSecurityEndpoints(appConfig.Endpoints, securityEndpoints)
 	}
 
 	/**

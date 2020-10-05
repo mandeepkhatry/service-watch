@@ -39,7 +39,6 @@ func LoadSwagger(swaggerConfig *openapi3.Swagger, watchConfig map[string]interfa
 
 				if !utils.EpRedundancyPresent(eachEpPart, endpoints[root]) {
 					endpoints[root] = append(endpoints[root], map[string]models.Endpoint{eachEpPart: models.Endpoint{Root: eachEpPart}})
-
 				}
 
 			}
