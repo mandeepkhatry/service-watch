@@ -56,7 +56,7 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}, s
 
 							contentType := utils.GetContent(methodOperations.RequestBody.Value.Content)
 
-							buffer, contentType, _ := content.ContentBasedData[contentType](methodOperations.RequestBody.Value.Content[contentType].Schema, methodOperations.RequestBody.Value.Content[contentType].Encoding, appConfig.Components)
+							buffer, contentType, _ := content.ContentBasedData[contentType](methodOperations.RequestBody.Value.Content[contentType].Schema, methodOperations.RequestBody.Value.Content[contentType].Encoding, appConfig.Components, childEpName)
 
 							dBuffer := models.DataBuffer{}
 
