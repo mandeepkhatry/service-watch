@@ -3,11 +3,13 @@ package content
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"mime/multipart"
 	"os"
 	"service-watch/internal/schema"
 	"service-watch/internal/utils"
+	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
 )
@@ -32,9 +34,13 @@ var ContentBasedData = map[string]func(configSchema *openapi3.SchemaRef, encodin
 
 		root, _ := os.Getwd()
 
+		fmt.Println("FILETYPE : ", fileContent)
+
 		for fileField, fileType := range fileContent {
 
-			path := root + "/static/" + endpoint + fileType
+			path := root + "/static/" + strings.TrimPrefix(endpoint, "/") + "." + fileType
+
+			fmt.Println("FILETYPE : ", path)
 
 			file, err := os.Open(path)
 			if err != nil {

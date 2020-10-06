@@ -68,7 +68,7 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}, s
 
 							response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, buffer, requestConfig.Content)
 
-							openApiSchema := utils.GetCorrespondingSchema(strconv.Itoa(response.StatusCode), methodOperations.Responses, appConfig.Components)
+							openApiSchema := utils.GetCorrespondingSchema(strconv.Itoa(response.StatusCode), methodOperations.Responses)
 
 							responseValid, errorMessage, _ := validator.ValidateResponseWrtSchema(openApiSchema, response.Message.(map[string]interface{}))
 
@@ -127,7 +127,7 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}, s
 								}
 								fmt.Println(response)
 
-								openApiSchema := utils.GetCorrespondingSchema(strconv.Itoa(response.StatusCode), methodOperations.Responses, appConfig.Components)
+								openApiSchema := utils.GetCorrespondingSchema(strconv.Itoa(response.StatusCode), methodOperations.Responses)
 
 								responseValid, errorMessage, _ := validator.ValidateResponseWrtSchema(openApiSchema, response.Message.(map[string]interface{}))
 								response.ResponseValidity = true

@@ -20,30 +20,29 @@ func FindFileContent(configSchema *openapi3.SchemaRef, components openapi3.Compo
 
 	fileContent := make(map[string]string)
 
-	component, subcomponent := FindComponent((configSchema.Ref))
-	if component == "schemas" {
-		var schema map[string]interface{}
-		schemaBytes, _ := components.Schemas[subcomponent].MarshalJSON()
-		json.Unmarshal(schemaBytes, &schema)
+	var schema map[string]interface{}
+	schemaByte, _ := configSchema.Value.MarshalJSON()
 
-		if _, present := schema["properties"]; present {
-			objectProperties := schema["properties"].(map[string]interface{})
+	json.Unmarshal(schemaByte, &schema)
 
-			for field, fieldProperties := range objectProperties {
+	if _, present := schema["properties"]; present {
+		objectProperties := schema["properties"].(map[string]interface{})
 
-				if _, formatPresent := fieldProperties.(map[string]interface{})["format"].(string); formatPresent {
-					format := fieldProperties.(map[string]interface{})["format"].(string)
+		for field, fieldProperties := range objectProperties {
 
-					if _, encodingPresent := def.ContentEncoding[format]; encodingPresent {
-						if _, openAPIEncoding := encoding[field]; openAPIEncoding {
-							fileContent[field] = mime.GetExtension(encoding[field].ContentType)
-						}
+			if _, formatPresent := fieldProperties.(map[string]interface{})["format"].(string); formatPresent {
+				format := fieldProperties.(map[string]interface{})["format"].(string)
+
+				if _, encodingPresent := def.ContentEncoding[format]; encodingPresent {
+					if _, openAPIEncoding := encoding[field]; openAPIEncoding {
+						fileContent[field] = mime.GetExtension(encoding[field].ContentType)
 					}
 				}
-
 			}
+
 		}
 	}
+
 	return fileContent
 
 }

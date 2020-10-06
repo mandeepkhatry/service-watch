@@ -6,21 +6,28 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
-func GetCorrespondingSchema(status string, responses openapi3.Responses, components openapi3.Components) map[string]interface{} {
+func GetCorrespondingSchema(status string, responses openapi3.Responses) map[string]interface{} {
 
-	contentType := GetContent(responses[status].Value.Content)
+	responseByte, _ := responses[status].Value.MarshalJSON()
+
+	var responseMap map[string]interface{}
+
+	json.Unmarshal(responseByte, &responseMap)
+
+	contentType := ""
+
+	for cType := range responseMap["content"].(map[string]interface{}) {
+		contentType = cType
+		break
+	}
 
 	openapiSchema := responses[status].Value.Content[contentType].Schema
 
-	component, subcomponent := FindComponent(openapiSchema.Ref)
-
 	var schema map[string]interface{}
 
-	if component == "schemas" {
-		schemaBytes, _ := components.Schemas[subcomponent].MarshalJSON()
-		json.Unmarshal(schemaBytes, &schema)
+	schemaByte, _ := openapiSchema.Value.MarshalJSON()
 
-	}
+	json.Unmarshal(schemaByte, &schema)
 
 	return schema
 
