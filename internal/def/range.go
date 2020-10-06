@@ -3,11 +3,11 @@ package def
 //DummyDataRange represents default range for fields
 var DummyDataRange = map[string]interface{}{
 	"integer": map[string]int{
-		"minimum": 0,
+		"minimum": 5,
 		"maximum": 10,
 	},
 	"number": map[string]float64{
-		"minimum": 0.0,
+		"minimum": 5.0,
 		"maximum": 10.0,
 	},
 	"string": map[string]int{
@@ -15,7 +15,7 @@ var DummyDataRange = map[string]interface{}{
 		"maxLength": 10,
 	},
 	"array": map[string]int{
-		"minimum": 1,
-		"maximum": 10,
+		"minimum": 2,
+		"maximum": 5,
 	},
 }

@@ -3,7 +3,6 @@ package content
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"mime/multipart"
 	"os"
@@ -34,13 +33,9 @@ var ContentBasedData = map[string]func(configSchema *openapi3.SchemaRef, encodin
 
 		root, _ := os.Getwd()
 
-		fmt.Println("FILETYPE : ", fileContent)
-
 		for fileField, fileType := range fileContent {
 
-			path := root + "/static/" + strings.TrimPrefix(endpoint, "/") + "." + fileType
-
-			fmt.Println("FILETYPE : ", path)
+			path := root + "/static/" + strings.TrimPrefix(endpoint, "/") + "/" + fileField + "." + fileType
 
 			file, err := os.Open(path)
 			if err != nil {
