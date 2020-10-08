@@ -51,12 +51,17 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}, s
 
 					for methodName, methodOperations := range eachMethod {
 						fmt.Println("Method : ", methodName)
+						var err error
 
 						if _, present := def.SchemaBasedMethods[methodName]; present {
 
 							contentType := utils.GetContent(methodOperations.RequestBody.Value.Content)
 
-							buffer, contentType, _ := content.ContentBasedData[contentType](methodOperations.RequestBody.Value.Content[contentType].Schema, methodOperations.RequestBody.Value.Content[contentType].Encoding, appConfig.Components, childEpName)
+							buffer, contentType, err := content.ContentBasedData[contentType](methodOperations.RequestBody.Value.Content[contentType].Schema, methodOperations.RequestBody.Value.Content[contentType].Encoding, appConfig.Components, childEpName)
+
+							if err != nil {
+								return nil, err
+							}
 
 							dBuffer := models.DataBuffer{}
 
@@ -66,7 +71,11 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}, s
 
 							requestConfig.Content["Content-Type"] = contentType
 
-							response, _ := httpClient.ExecuteRequest(methodName, specificEndpoint, buffer, requestConfig.Content)
+							response, err := httpClient.ExecuteRequest(methodName, specificEndpoint, buffer, requestConfig.Content)
+
+							if err != nil {
+								return nil, err
+							}
 
 							fmt.Println(response)
 
@@ -96,7 +105,6 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}, s
 							endpointsDataBuffer[childEpName][methodName] = dBuffer
 
 						} else {
-
 							//Methods GET/DELETE
 
 							if _, present := def.RearMostMethod[methodName]; present {
@@ -124,17 +132,24 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}, s
 
 									ep := parser.GenerateRequestQuery(specificEndpoint, methodOperations.Parameters, response)
 
-									response, _ = httpClient.ExecuteRequest(methodName, ep, nil, requestConfig.Content)
+									response, err = httpClient.ExecuteRequest(methodName, ep, nil, requestConfig.Content)
+
+									if err != nil {
+										return nil, err
+									}
 
 								}
 								fmt.Println(response)
 
 								openApiSchema := utils.GetCorrespondingSchema(strconv.Itoa(response.StatusCode), methodOperations.Responses)
 
-								responseValid, errorMessage, _ := validator.ValidateResponseWrtSchema(openApiSchema, response.Message.(map[string]interface{}))
+								responseValid, errorMessage, err := validator.ValidateResponseWrtSchema(openApiSchema, response.Message.(map[string]interface{}))
 								response.ResponseValidity = true
 								response.ResponseValidityError = errorMessage
 
+								if err != nil {
+									return nil, err
+								}
 								//Find status of endpoint and append to logs accordingly
 
 								status, log := utils.LogExtract(childEpName, methodName, response, responseValid)
@@ -171,7 +186,12 @@ func ProcessRequest(appConfig models.AppConfig, config map[string]interface{}, s
 		fmt.Println("--------------------------------")
 		fmt.Println("Endpoint : ", ep)
 		fmt.Println("Method : ", epProperties.MethodName)
-		response, _ := httpClient.ExecuteRequest(epProperties.MethodName, epProperties.SpecificEndpoint, utils.ConvertMap(epProperties.RequestBody), epProperties.RequestConfig)
+		response, err := httpClient.ExecuteRequest(epProperties.MethodName, epProperties.SpecificEndpoint, utils.ConvertMap(epProperties.RequestBody), epProperties.RequestConfig)
+
+		if err != nil {
+			return nil, err
+		}
+
 		fmt.Println(response)
 		//Find status of endpoint and append to logs accordingly
 

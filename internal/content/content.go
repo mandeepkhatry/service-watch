@@ -3,9 +3,11 @@ package content
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"mime/multipart"
 	"os"
+	"service-watch/internal/def"
 	"service-watch/internal/schema"
 	"service-watch/internal/utils"
 
@@ -36,8 +38,14 @@ var ContentBasedData = map[string]func(configSchema *openapi3.SchemaRef, encodin
 
 			path := root + "/static" + endpoint + "/" + fileField + "." + fileType
 
+			if _, err := os.Stat(path); os.IsNotExist(err) {
+				return nil, "", def.ErrInvalidFormFileSyntax
+			}
+
 			file, err := os.Open(path)
+
 			if err != nil {
+				fmt.Println(err)
 				return nil, "", err
 			}
 			fileContents, err := ioutil.ReadAll(file)
