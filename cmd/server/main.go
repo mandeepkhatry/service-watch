@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -16,26 +17,6 @@ import (
 
 var logsDir string
 var storeLog *logs.StoreLog
-
-func init() {
-	configFile, err := os.Open("config/watch.json")
-
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	var watchConfig map[string]interface{}
-
-	watchConfigByte, _ := ioutil.ReadAll(configFile)
-
-	json.Unmarshal(watchConfigByte, &watchConfig)
-
-	logsDir = watchConfig["logs_dir"].(string)
-
-	storeLog = logs.NewLog(watchConfig["store"].(string), watchConfig["logs_dir"].(string))
-
-	configFile.Close()
-}
 
 func SearchHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -81,7 +62,31 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	configPath := flag.String("config", "", "config path")
+
+	flag.Parse()
+
+	configFile, err := os.Open(string(*configPath))
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	var watchConfig map[string]interface{}
+
+	watchConfigByte, _ := ioutil.ReadAll(configFile)
+
+	json.Unmarshal(watchConfigByte, &watchConfig)
+
+	logsDir = watchConfig["logs_dir"].(string)
+
+	storeLog = logs.NewLog(watchConfig["store"].(string), watchConfig["logs_dir"].(string))
+
+	configFile.Close()
+
 	router := mux.NewRouter()
+
 	router.HandleFunc("/search", SearchHandler).Methods("GET")
+
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
