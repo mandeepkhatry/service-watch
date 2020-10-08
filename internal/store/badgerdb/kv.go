@@ -25,7 +25,6 @@ func (s *StoreClient) NewClient(dir string) error {
 	}
 
 	defaultOptions := badger.DefaultOptions(dir)
-	defaultOptions.Truncate = true
 	db, err := badger.Open(defaultOptions)
 	if err != nil {
 		return err

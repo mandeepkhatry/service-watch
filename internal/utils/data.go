@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"strings"
+
+	"github.com/araddon/dateparse"
 )
 
 func DataMatching(data map[string]interface{}) map[string]interface{} {
@@ -31,4 +33,12 @@ func ConvertBuffer(buffer *bytes.Buffer) map[string]interface{} {
 func ConvertMap(data map[string]interface{}) *bytes.Buffer {
 	dataBytes, _ := json.Marshal(data)
 	return bytes.NewBuffer(dataBytes)
+}
+
+func FormatConstantDate(s string) (string, error) {
+	var err error
+	if dateFormat, err := dateparse.ParseFormat(s); err == nil {
+		return dateFormat, nil
+	}
+	return s, err
 }
