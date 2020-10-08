@@ -556,7 +556,7 @@
             },
             "summary": ""
         },
-        "/upload-file": {
+        "/upload-file/a/b/c": {
             "description": "",
             "post": {
                 "tags": [

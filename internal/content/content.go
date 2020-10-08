@@ -8,7 +8,6 @@ import (
 	"os"
 	"service-watch/internal/schema"
 	"service-watch/internal/utils"
-	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
 )
@@ -35,7 +34,7 @@ var ContentBasedData = map[string]func(configSchema *openapi3.SchemaRef, encodin
 
 		for fileField, fileType := range fileContent {
 
-			path := root + "/static/" + strings.TrimPrefix(endpoint, "/") + "/" + fileField + "." + fileType
+			path := root + "/static" + endpoint + "/" + fileField + "." + fileType
 
 			file, err := os.Open(path)
 			if err != nil {

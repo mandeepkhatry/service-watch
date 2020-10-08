@@ -11,15 +11,15 @@ func LogExtract(ep string, method string, response models.HeartBeatResponse, res
 	status := ""
 
 	if response.StatusCode == 0 {
-		status = "timeout"
+		status = def.StatusTimeout
 	} else {
 		if !responseValid {
-			status = "invalid_response"
+			status = def.StatusInvalidResponse
 		} else {
 			if _, present := def.AccpetedStatus[method][response.StatusCode]; present {
-				status = "success"
+				status = def.StatusSuccess
 			} else {
-				status = "failure"
+				status = def.StatusFailure
 			}
 		}
 
