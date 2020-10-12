@@ -22,7 +22,8 @@ type ServiceWatcher struct {
 	Timeout             int
 	LogsDir             string
 	Store               string
-	Periodicity         int
+	Periodicity         string
+	LogsFlush           string
 	SecurityEndpoints   []string
 	SecurityCredentials map[string]interface{}
 }
@@ -108,7 +109,8 @@ func NewServiceWatcher(configPath string) (*ServiceWatcher, error) {
 		Timeout:             int(watchConfig["timeout"].(float64)),
 		LogsDir:             watchConfig["logs_dir"].(string),
 		Store:               watchConfig["store"].(string),
-		Periodicity:         int(watchConfig["periodicity"].(float64)),
+		Periodicity:         watchConfig["periodicity"].(string),
+		LogsFlush:           watchConfig["logs_flush"].(string),
 		SecurityEndpoints:   securityEndpoints,
 		SecurityCredentials: credentials,
 	}, nil
@@ -145,11 +147,32 @@ func (s *ServiceWatcher) Watch() error {
 		"timeout": s.Timeout,
 	}
 
-	ticker := time.NewTicker(time.Duration(s.Periodicity) * time.Second)
+	periodicity, err := time.ParseDuration(s.Periodicity)
+
+	if err != nil {
+		return err
+	}
+
+	logsFlushPeriod, err := time.ParseDuration(s.LogsFlush)
+
+	if err != nil {
+		return err
+	}
+
+	ticker := time.NewTicker(periodicity)
 
 	storeLog := logs.NewLog(s.Store, s.LogsDir)
 
+	var logsFlushTimeStart time.Time
+	logsFlushStatus := true
+
 	for range ticker.C {
+
+		if logsFlushStatus {
+			logsFlushTimeStart = time.Now()
+			logsFlushStatus = false
+		}
+
 		fmt.Println("*******************************************************")
 		log, err := heartbeat.ProcessRequest(s.ApiConfiguration, config, s.SecurityEndpoints, s.SecurityCredentials)
 
@@ -159,6 +182,13 @@ func (s *ServiceWatcher) Watch() error {
 
 		storeLog.StoreLogs(log)
 		fmt.Println("***********************************************************")
+
+		if time.Since(logsFlushTimeStart) >= logsFlushPeriod {
+			//flush logs store
+
+			logsFlushStatus = true
+
+		}
 
 	}
 

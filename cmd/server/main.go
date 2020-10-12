@@ -61,7 +61,7 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-func main() {
+func RunServer() {
 	configPath := flag.String("config", "", "config path")
 
 	flag.Parse()
@@ -89,4 +89,8 @@ func main() {
 	router.HandleFunc("/search", SearchHandler).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
+}
+
+func main() {
+	RunServer()
 }
