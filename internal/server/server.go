@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"service-watch/internal/formatter"
 	"service-watch/internal/logs"
+	encode "service-watch/internal/server/response"
 	"service-watch/internal/utils"
 	"time"
 
@@ -22,10 +23,20 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	status, _ := query["status"]
 
 	var ids interface{}
+	data := make([]map[string]interface{}, 0)
 
-	resultBytes, _ := storeLog.Store.Get([]byte("status:" + status[0]))
+	resultBytes, err := storeLog.Store.Get([]byte("status:" + status[0]))
+
+	if err != nil {
+		encode.JsonEncode(w, data, http.StatusInternalServerError)
+	}
 
 	json.Unmarshal(resultBytes, &ids)
+
+	if ids == nil {
+		encode.JsonEncode(w, data, http.StatusNotFound)
+		return
+	}
 
 	keys := make([][]byte, 0)
 
@@ -41,8 +52,6 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	byteKeys, _ := storeLog.Store.GetBatch(keys)
 
-	data := make([]map[string]interface{}, 0)
-
 	for _, eachByteKey := range byteKeys {
 		var eachResult map[string]interface{}
 		json.Unmarshal(eachByteKey, &eachResult)
@@ -50,12 +59,8 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	result := make(map[string]interface{})
-	result["data"] = data
-
-	w.WriteHeader(http.StatusOK)
-
-	json.NewEncoder(w).Encode(result)
+	encode.JsonEncode(w, data, http.StatusOK)
+	return
 }
 
 func RunServer(store *logs.StoreLog) {

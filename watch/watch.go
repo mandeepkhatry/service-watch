@@ -166,6 +166,7 @@ func (s *ServiceWatcher) Watch() error {
 
 	var logsFlushTimeStart time.Time
 	logsFlushStatus := true
+
 	go server.RunServer(storeLog)
 
 	for range ticker.C {
