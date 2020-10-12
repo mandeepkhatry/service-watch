@@ -17,6 +17,16 @@ func NewLog(storeSpace string, dir string) *StoreLog {
 	}
 }
 
+func (l *StoreLog) FlushLogs() error {
+	keys, err := l.Store.GetAllKeys()
+
+	if err != nil {
+		return err
+	}
+
+	return l.Store.DeleteBatch(keys)
+}
+
 func (l *StoreLog) StoreLogs(logs map[string][]interface{}) error {
 
 	store := l.Store

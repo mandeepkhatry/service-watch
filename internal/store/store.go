@@ -10,10 +10,14 @@ type Store interface {
 	Put(key []byte, value []byte) error
 	//PutBatch inserts key,val pairs in batch
 	PutBatch(keys [][]byte, values [][]byte) error
+	//Get all keys
+	GetAllKeys() ([][]byte, error)
 	//Get retrieves value for given key
 	Get(key []byte) ([]byte, error)
 	//GetBatch retrieves values for given collection of keys in batch
 	GetBatch(keys [][]byte) ([][]byte, error)
+	//DeleteBatch deletes batch
+	DeleteBatch(keys [][]byte) error
 	//DeleteKey deletes given key from DB
 	DeleteKey(key []byte) error
 	//DeleteKeyRange deletes key,val pairs from startKey to endKey from DB

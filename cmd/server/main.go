@@ -88,7 +88,7 @@ func RunServer() {
 
 	router.HandleFunc("/search", SearchHandler).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":5000", router))
 }
 
 func main() {

@@ -422,3 +422,39 @@ func (s *StoreClient) ReversePrefixScan(endKey []byte, prefix []byte, limit int)
 	}
 
 }
+
+func (s *StoreClient) GetAllKeys() ([][]byte, error) {
+
+	keys := make([][]byte, 0)
+
+	err := s.DB.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchSize = 10
+		it := txn.NewIterator(opts)
+		defer it.Close()
+
+		for it.Rewind(); it.Valid(); it.Next() {
+			item := it.Item()
+			k := item.Key()
+			keys = append(keys, k)
+		}
+		return nil
+	})
+
+	return keys, err
+}
+
+func (s *StoreClient) DeleteBatch(keys [][]byte) error {
+
+	wb := s.DB.NewWriteBatch()
+	defer wb.Cancel()
+
+	for _, key := range keys {
+		err := wb.Delete(key)
+		if err != nil {
+			return err
+		}
+	}
+	err := wb.Flush()
+	return err
+}

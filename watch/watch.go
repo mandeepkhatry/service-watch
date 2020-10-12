@@ -173,7 +173,7 @@ func (s *ServiceWatcher) Watch() error {
 			logsFlushStatus = false
 		}
 
-		fmt.Println("*******************************************************")
+		fmt.Println("************************************************************")
 		log, err := heartbeat.ProcessRequest(s.ApiConfiguration, config, s.SecurityEndpoints, s.SecurityCredentials)
 
 		if err != nil {
@@ -186,6 +186,13 @@ func (s *ServiceWatcher) Watch() error {
 		if time.Since(logsFlushTimeStart) >= logsFlushPeriod {
 			//flush logs store
 
+			fmt.Println("[flush] Store Logs")
+			err := storeLog.FlushLogs()
+			if err != nil {
+				return err
+			}
+
+			//flip status
 			logsFlushStatus = true
 
 		}

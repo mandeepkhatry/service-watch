@@ -4,7 +4,7 @@
     "logs_dir": "/logs",
     "store": "badgerdb",
     "periodicity": "1s",
-    "logs_flush": "1s",
+    "logs_flush": "10s",
     "timeout": 10,
     "ignore_endpoints": ["/refresh_token"],
     "security_endpoints": ["/login"],
