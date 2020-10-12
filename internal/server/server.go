@@ -1,12 +1,9 @@
-package main
+package server
 
 import (
 	"encoding/json"
-	"flag"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"service-watch/internal/formatter"
 	"service-watch/internal/logs"
 	"service-watch/internal/utils"
@@ -61,36 +58,13 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-func RunServer() {
-	configPath := flag.String("config", "", "config path")
+func RunServer(store *logs.StoreLog) {
 
-	flag.Parse()
-
-	configFile, err := os.Open(string(*configPath))
-
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	var watchConfig map[string]interface{}
-
-	watchConfigByte, _ := ioutil.ReadAll(configFile)
-
-	json.Unmarshal(watchConfigByte, &watchConfig)
-
-	logsDir = watchConfig["logs_dir"].(string)
-
-	storeLog = logs.NewLog(watchConfig["store"].(string), watchConfig["logs_dir"].(string))
-
-	configFile.Close()
+	storeLog = store
 
 	router := mux.NewRouter()
 
 	router.HandleFunc("/search", SearchHandler).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":5000", router))
-}
-
-func main() {
-	RunServer()
 }

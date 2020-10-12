@@ -11,6 +11,7 @@ import (
 	"service-watch/internal/loader"
 	"service-watch/internal/logs"
 	"service-watch/internal/models"
+	"service-watch/internal/server"
 	"service-watch/internal/store"
 	"time"
 
@@ -165,6 +166,7 @@ func (s *ServiceWatcher) Watch() error {
 
 	var logsFlushTimeStart time.Time
 	logsFlushStatus := true
+	go server.RunServer(storeLog)
 
 	for range ticker.C {
 
