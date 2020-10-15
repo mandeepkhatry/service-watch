@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"reflect"
 	"service-watch/internal/def"
@@ -45,44 +46,34 @@ func NewServiceWatcher(configPath string) (*ServiceWatcher, error) {
 
 	configFile.Close()
 
-	//Comment for now...
+	ep := watchConfig["host"].(string) + watchConfig["endpoint"].(string)
 
-	// ep := watchConfig["host"].(string) + watchConfig["endpoint"].(string)
+	resp, err := http.Get(ep)
 
-	// resp, err := http.Get(ep)
-
-	// if err != nil {
-	// 	return &ServiceWatcher{}, err
-	// }
-
-	// body, err := ioutil.ReadAll(resp.Body)
-
-	// if err != nil {
-	// 	return &ServiceWatcher{}, err
-	// }
-
-	// resp.Body.Close()
-
-	openApiFile, err := os.Open("config/test.json")
-
-	if err != nil {
-		panic(err)
-	}
-
-	byteValue, _ := ioutil.ReadAll(openApiFile)
-
-	swagger, err := openapi3.NewSwaggerLoader().LoadSwaggerFromData(byteValue)
 	if err != nil {
 		return &ServiceWatcher{}, err
 	}
 
-	openApiFile.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return &ServiceWatcher{}, err
+	}
+
+	resp.Body.Close()
+
+	swagger, err := openapi3.NewSwaggerLoader().LoadSwaggerFromData(body)
+	if err != nil {
+		return &ServiceWatcher{}, err
+	}
 
 	appConfig, err := loader.LoadSwagger(swagger, watchConfig)
 
 	if err != nil {
 		return &ServiceWatcher{}, err
 	}
+
+	fmt.Println("APP CONFIG : ", appConfig)
 
 	if _, storePresent := store.Stores[watchConfig["store"].(string)]; !storePresent {
 		return &ServiceWatcher{}, def.ErrStoreUnavailable

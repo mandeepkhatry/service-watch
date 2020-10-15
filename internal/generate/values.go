@@ -207,51 +207,30 @@ func GenerateRegex(regex string) string {
 
 func GenerateArray(properties map[string]interface{}) interface{} {
 
-	if _, typePresent := properties["items"]; !typePresent {
-		var maxItems int
+	minItems := def.DummyDataRange["array"].(map[string]int)["minItems"]
 
-		if _, present := properties["maxItems"]; !present {
-			maxItems = def.DummyDataRange["array"].(map[string]int)["maximum"]
-		} else {
-			maxItems = int(properties["maxItems"].(float64))
-		}
-
-		// if _, present := properties["minItems"]; !present {
-		// 	minItems = 0
-		// } else {
-		// 	minItems = properties["minItems"].(int)
-		// }
-
-		numberArray := make([]float64, 0)
-
-		var arrayProperties = map[string]interface{}{
-			"maximum": def.DummyDataRange["number"].(map[string]int)["maximum"],
-			"minimum": def.DummyDataRange["number"].(map[string]int)["minimum"],
-		}
-
-		for i := 0; i < maxItems; i++ {
-			numberArray = append(numberArray, GenerateFloat(arrayProperties))
-		}
-
-		return numberArray
+	if min, present := properties["minItems"]; present {
+		minItems = int(min.(float64))
 	}
 
 	arrayItemType := fmt.Sprintf("%T", properties["items"])
 
-	if arrayItemType == "[]map[string]interface {}" {
+	if arrayItemType == "[]interface {}" {
 
 		resultingArray := make([]interface{}, 0)
 
-		for _, eachTypeProperties := range properties["items"].([]map[string]interface{}) {
+		for _, eachTypeProperties := range properties["items"].([]interface{}) {
 
-			eachArrayType := eachTypeProperties["type"].(string)
+			eachProperties := eachTypeProperties
+
+			eachArrayType := eachProperties.(map[string]interface{})["type"].(string)
 
 			if eachArrayType == "array" {
-				resultingArray = append(resultingArray, GenerateArray(eachTypeProperties))
+				resultingArray = append(resultingArray, GenerateArray(eachProperties.(map[string]interface{})))
 			} else if eachArrayType == "object" {
-				resultingArray = append(resultingArray, GenerateObject(eachTypeProperties))
+				resultingArray = append(resultingArray, GenerateObject(eachProperties.(map[string]interface{})))
 			} else {
-				resultingArray = append(resultingArray, FieldToGenerator[eachArrayType](eachTypeProperties))
+				resultingArray = append(resultingArray, FieldToGenerator[eachArrayType](eachProperties.(map[string]interface{})))
 			}
 
 		}
@@ -260,16 +239,30 @@ func GenerateArray(properties map[string]interface{}) interface{} {
 		//Mix Type Array
 
 	} else if arrayItemType == "map[string]interface {}" {
+		resultingArray := make([]interface{}, 0)
+
+		prop := properties["items"]
 
 		//Single Type Arrays
 
-		itemType := properties["items"].(map[string]interface{})["type"].(string)
+		itemType := prop.(map[string]interface{})["type"].(string)
 
 		if itemType == "array" {
-			return GenerateArray(properties["items"].(map[string]interface{}))
+			for i := 0; i < minItems; i++ {
+				resultingArray = append(resultingArray, GenerateArray(prop.(map[string]interface{})))
+			}
+
 		} else if itemType == "object" {
-			return []interface{}{GenerateObject(properties["items"].(map[string]interface{}))}
+			for i := 0; i < minItems; i++ {
+				resultingArray = append(resultingArray, GenerateObject(prop.(map[string]interface{})))
+			}
+		} else {
+			for i := 0; i < minItems; i++ {
+				resultingArray = append(resultingArray, FieldToGenerator[itemType](prop.(map[string]interface{})))
+			}
 		}
+
+		return resultingArray
 	}
 
 	return []string{}

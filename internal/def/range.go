@@ -15,7 +15,7 @@ var DummyDataRange = map[string]interface{}{
 		"maxLength": 10,
 	},
 	"array": map[string]int{
-		"minimum": 2,
-		"maximum": 5,
+		"minItems": 2,
+		"maxItems": 5,
 	},
 }
